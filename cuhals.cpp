@@ -46,14 +46,12 @@ void seqCpuUpdate(int const N, int const P,
         float* Bn = Beta + ldBeta * ndx;
         if (nonnegative){
 #pragma omp simd
-            for (int pdx = 0; pdx < P; pdx++){
+            for (int pdx = 0; pdx < P; pdx++)
                 Bn[pdx] = rect(Bn[pdx] + Dn[pdx]);
-            }
         } else {
 #pragma omp simd
-            for (int pdx = 0; pdx < P; pdx++){
+            for (int pdx = 0; pdx < P; pdx++)
                 Bn[pdx] = Bn[pdx] + Dn[pdx];
-            }
         }
     }
 }
