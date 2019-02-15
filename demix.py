@@ -16,12 +16,9 @@ class SpatialHals():
                         batch=32,
                         **kwargs):
         """ Fast Hals Update Of Spatial Components """
-        torch.diag(self.covariance.data, out=self.scale.data)
-        torch.div(1, self.scale.data, out=self.scale.data)
         cuhals.update(self.spatial.data,
                       self.spatial.scratch,
                       self.covariance.data,
-                      #self.scale.data,
                       nonnegative,
                       batch)
 
@@ -33,12 +30,9 @@ class TemporalHals():
                          batch=32,
                          **kwargs):
         """ Fast Hals Update Of Temporal Components """
-        torch.diag(self.covariance.data, out=self.scale.data)
-        torch.div(1, self.scale.data, out=self.scale.data)
         cuhals.update(self.temporal.data,
                       self.temporal.scratch,
                       self.covariance.data,
-                      #self.scale.data,
                       nonnegative,
                       batch)
 
