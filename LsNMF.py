@@ -247,18 +247,19 @@ def evaluate_fit_to_region(low_rank_video,
                            region_mask,
                            r2_thresh=.98,
                            sample_prop=(1, 1),
+                           device='cuda',
                            **kwargs):
     """ Compute Coef Of Determination Of Current Fit """
     region_idx = torch.nonzero(region_mask).squeeze()
     if sample_prop[0] < 1.0:
-        perm = torch.randperm(region_idx.size(0), device='cuda')
+        perm = torch.randperm(region_idx.size(0), device=device)
         k = int(np.ceil(sample_prop[0] * region_idx.size(0)))
         region_idx = torch.index_select(region_idx,
                                         0,
                                         perm[:k])
 
     if sample_prop[1] < 1.0:
-        perm = torch.randperm(low_rank_video.temporal.shape[1], device='cuda')
+        perm = torch.randperm(low_rank_video.temporal.shape[1], device=device)
         temporal_idx = perm[:int(np.ceil(sample_prop[1] * low_rank_video.temporal.shape[1]))]
         mov = torch.matmul(torch.index_select(low_rank_video.spatial.data,
                                               1,

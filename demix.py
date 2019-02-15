@@ -21,7 +21,7 @@ class SpatialHals():
         cuhals.update(self.spatial.data,
                       self.spatial.scratch,
                       self.covariance.data,
-                      self.scale.data,
+                      #self.scale.data,
                       nonnegative,
                       batch)
 
@@ -38,7 +38,7 @@ class TemporalHals():
         cuhals.update(self.temporal.data,
                       self.temporal.scratch,
                       self.covariance.data,
-                      self.scale.data,
+                      #self.scale.data,
                       nonnegative,
                       batch)
 

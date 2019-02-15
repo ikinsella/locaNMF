@@ -17,15 +17,11 @@ scalar_t* shared_memory_proxy()
 
 template<typename scalar_t>
 __global__ 
-void updateKernel(const int N,
-                  const int P,
-                  scalar_t*        __restrict__ g_Beta, 
-                  scalar_t const * __restrict__ g_Delta,
-                  const int ldBeta,
-                  scalar_t const * __restrict__ g_Sigma,
-                  scalar_t const * __restrict__ g_scale,
-                  const int ldSigma,
-                  const bool nonnegative) 
+void updateKernel(int const N, int const P,
+                  scalar_t*        __restrict__ g_Beta,  int const ldBeta,
+                  scalar_t const * __restrict__ g_Delta, int const ldDelta,
+                  scalar_t const * __restrict__ g_Sigma, int const ldSigma,
+                  bool const nonnegative) 
 {
     // Offsets For Accessing Shared & Local Mem
     const int thread_id = threadIdx.x + (threadIdx.y * blockDim.x); 
@@ -41,7 +37,8 @@ void updateKernel(const int N,
     // Copy All Of Scale To Shared Memory Early 
     __syncthreads();
     if (thread_id < N){
-        s_scale[thread_id] = g_scale[thread_id]; 
+        const scalar_t var = g_Sigma[thread_id * ldSigma + thread_id];
+        s_scale[thread_id] = (var > 0) ? (1 / var) : 0; 
     }
     // Copy Block's Slice Of Beta To Shared Memory
     __syncthreads();
@@ -87,15 +84,11 @@ void updateKernel(const int N,
     }
 }
 
-void launchUpdateKernel(const int N,
-                        const int P,
-                        float* __restrict__ Beta,
-                        const float* __restrict__ Delta,
-                        const int ldBeta,
-                        const float* __restrict__ Sigma,
-                        const float* __restrict__ scale,
-                        const int ldSigma,
-                        const bool nonnegative)
+void gpuUpdate(int const N, int const P,
+               float*       __restrict__ Beta,  int const ldBeta,
+               float* const __restrict__ Delta, int const ldDelta,
+               float* const __restrict__ Sigma, int const ldSigma,
+               bool const nonnegative)
 {
 // Compute Grid & Block Layouts
 const size_t smem = sizeof(float) * ((WARP_SIZE + 2) * N + WARP_SIZE);
@@ -106,7 +99,8 @@ const dim3 grid((P + block.x - 1) / block.x);
 
 // Dispatch Kernel
 updateKernel<float><<<grid, block, smem>>>(N, P,
-                                           Beta, Delta, ldBeta,
-                                           Sigma, scale, ldSigma,
+                                           Beta, ldBeta,
+                                           Delta, ldDelta,
+                                           Sigma, ldSigma,
                                            nonnegative);
 }
