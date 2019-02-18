@@ -9,12 +9,11 @@ LIBRARIES = ["magma"]
 
 setup(name='fasthals',
       ext_modules=[
-          CUDAExtension('cuhals', 
+          CUDAExtension('cuhals',
                         ['cuhals.cpp', 'cuhals_kernels.cu'],
                         extra_compile_args={'cxx': ["-fopenmp"],
                                             'nvcc': []}),
       ],
       cmdclass={
           'build_ext': BuildExtension
-      }
-)
+      })
