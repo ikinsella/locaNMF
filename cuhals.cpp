@@ -40,7 +40,7 @@ void seqCpuUpdate(int const N, int const P,
         float const*const Sn = Sigma + ldSigma * ndx;
         float const       var = Sn[ndx];
 
-        // Correct For Residual For Inactive Components
+        // Correct Residual For Inactive Components
         cblas_sgemv(CblasColMajor, CblasNoTrans,
                     P, N,
                     -1.0 / var,
