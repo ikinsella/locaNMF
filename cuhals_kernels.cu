@@ -18,9 +18,9 @@ scalar_t* shared_memory_proxy()
 template<typename scalar_t>
 __global__ 
 void updateKernel(int const N, int const P,
-                  scalar_t*        __restrict__ g_Beta,  int const ldBeta,
-                  scalar_t const * __restrict__ g_Delta, int const ldDelta,
-                  scalar_t const * __restrict__ g_Sigma, int const ldSigma,
+                  scalar_t      *const __restrict__ g_Beta,  int const ldBeta,
+                  scalar_t const*const __restrict__ g_Delta, int const ldDelta,
+                  scalar_t const*const __restrict__ g_Sigma, int const ldSigma,
                   bool const nonnegative) 
 {
     // Offsets For Accessing Shared & Local Mem
@@ -85,9 +85,9 @@ void updateKernel(int const N, int const P,
 }
 
 void gpuUpdate(int const N, int const P,
-               float*       __restrict__ Beta,  int const ldBeta,
-               float* const __restrict__ Delta, int const ldDelta,
-               float* const __restrict__ Sigma, int const ldSigma,
+               float      *const __restrict__ Beta,  int const ldBeta,
+               float const*const __restrict__ Delta, int const ldDelta,
+               float const*const __restrict__ Sigma, int const ldSigma,
                bool const nonnegative)
 {
 // Compute Grid & Block Layouts

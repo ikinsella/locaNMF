@@ -12,9 +12,9 @@
 
 /* Cuda Kernel Dispatcher Defined In .cu File */
 void gpuUpdate(int const N, int const P,
-               float*       __restrict__ Beta,  int const ldBeta,
-               float* const __restrict__ Delta, int const ldDelta,
-               float* const __restrict__ Sigma, int const ldSigma,
+               float      *const __restrict__ Beta,  int const ldBeta,
+               float const*const __restrict__ Delta, int const ldDelta,
+               float const*const __restrict__ Sigma, int const ldSigma,
                bool const nonnegative);
 
 /* SIMD Parallelizable CPU Update Function */
@@ -27,23 +27,29 @@ float rect(float val) { return val > 0.0 ? val : 0; }
  *    Delta: NxP Row Major or PxN Col Major Precomputed Updates (YtX, XtY)
  */
 void seqCpuUpdate(int const N, int const P,
-                  float*       __restrict__ Beta,  int const ldBeta,
-                  float* const __restrict__ Delta, int const ldDelta,
-                  float* const __restrict__ Sigma, int const ldSigma,
+                  float      *const __restrict__ Beta,  int const ldBeta,
+                  float      *const __restrict__ Delta, int const ldDelta,
+                  float const*const __restrict__ Sigma, int const ldSigma,
                   bool const nonnegative)
 {
     for (int ndx = 0; ndx < N; ndx++)
     {
-        float* Dn = Delta + ldDelta * ndx;
-        const float var = Sigma[ndx * ldSigma + ndx];
+        // Active Component Slices & Variance
+        float      *const Bn = Beta + ldBeta * ndx;
+        float      *const Dn = Delta + ldDelta * ndx;
+        float const*const Sn = Sigma + ldSigma * ndx;
+        float const       var = Sn[ndx];
+
+        // Correct For Residual For Inactive Components
         cblas_sgemv(CblasColMajor, CblasNoTrans,
                     P, N,
                     -1.0 / var,
                     Beta, ldBeta,
-                    Sigma + ndx * ldSigma, 1,
+                    Sn, 1,
                     1.0 / var,
                     Dn, 1);
-        float* Bn = Beta + ldBeta * ndx;
+
+        // Perform (Independent) Scalar Updates
         if (nonnegative){
 #pragma omp simd
             for (int pdx = 0; pdx < P; pdx++)
@@ -51,7 +57,7 @@ void seqCpuUpdate(int const N, int const P,
         } else {
 #pragma omp simd
             for (int pdx = 0; pdx < P; pdx++)
-                Bn[pdx] = Bn[pdx] + Dn[pdx];
+                Bn[pdx] += Dn[pdx];
         }
     }
 }
@@ -62,9 +68,9 @@ void seqCpuUpdate(int const N, int const P,
  *    Delta: NxP Row Major or PxN Col Major Precomputed Updates (YtX, XtY)
  */
 void cpuUpdate(int const N, int const P,
-               float*       __restrict__ Beta,  int const ldBeta,
-               float* const __restrict__ Delta, int const ldDelta,
-               float* const __restrict__ Sigma, int const ldSigma,
+               float      *const __restrict__ Beta,  int const ldBeta,
+               float      *const __restrict__ Delta, int const ldDelta,
+               float const*const __restrict__ Sigma, int const ldSigma,
                bool const nonnegative)
 {
 #pragma omp parallel default(shared)
