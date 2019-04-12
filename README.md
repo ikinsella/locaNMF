@@ -20,7 +20,7 @@ when the preceeding installation is completed, you must also follow [Pythorch's]
 
 ### Enabling GPU Support
 
-LocaNMF is implemented using pytorch in order to take advantage of abstractions that allow the same code to execute on CPU and GPU. 
+LocaNMF is implemented using pytorch in order to take advantage of abstractions that allows us to provide one implementation that is capable of being run using either CPUs or GPUs. 
 To enable the use of your GPU you must have a a compatible CUDA installation, pytorch installation, and GPU available.
 Please reference [Pythorch's](https://pytorch.org/) documentation in order to achieve this.
 
@@ -35,7 +35,7 @@ python setup.py install
 
 ## (OPTIONAL) Compiling The Cuda Extension
 
-Pytorch provides an excellent set of general programming abstractions for writing high level code to execute on both CPU & GPU.
+Pytorch provides an excellent set of general programming abstractions for writing high level code that can use both CPUs & GPUs.
 However, these abstractions do not provide the flexibility required to implement certain computations efficiently on the GPU.
 In order to mitigate a significant bottleneck, we provide a cuda implementation and use a [c++/cuda extension](https://pytorch.org/tutorials/advanced/cpp_extension.html) to integrate it with pytorch.
 To enable use of this feature, an additional argument ```--with-extension``` must be added while invoking the installation script
