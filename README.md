@@ -28,8 +28,8 @@ Please reference (Pythorch's)[https://pytorch.org/] documentation in order to ac
 
 With your conda environment active and dependencies installed, you can install locaNMF by cloning the repository and running the installation script
 ```
-git clone url_for_repo
-cd lsnmf
+git clone https://github.com/ikinsella/locaNMF.git
+cd locaNMF
 python setup.py install
 ```
 
@@ -59,4 +59,5 @@ export PATH=$PATH:$CUDA_HOME/bin
 
 A known issue is that the ```nvcc``` compiler from Cuda 9.0 requires the availability of ```gcc``` older than the default on newer systems.
 In order to avoid compatibility issues, you should create a symbolic link to a compatible ```gcc``` into directory containing ```nvcc``` 
-For example, if you wish to use ```gcc-5``` (recommended) you would use the line ```ln -s /usr/bin/gcc-5 /path/to/cuda-9.0/bin/gcc```.
+For example, if you wish to use ```gcc-5``` (recommended) you would use the line 
+```ln -s /usr/bin/gcc-5 /path/to/cuda-9.0/bin/gcc```.
