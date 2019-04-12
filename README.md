@@ -16,13 +16,13 @@ The following lines will create a new environment with the required dependencies
 conda create -n locaNMF python=3 numpy scipy scikit-learn
 conda activate locaNMF
 ```
-when the preceeding installation is completed, you must also follow (Pythorch's)[https://pytorch.org/] installation instructions.
+when the preceeding installation is completed, you must also follow [Pythorch's](https://pytorch.org/) installation instructions.
 
 ### Enabling GPU Support
 
 LocaNMF is implemented using pytorch in order to take advantage of abstractions that allow the same code to execute on CPU and GPU. 
 To enable the use of your GPU you must have a a compatible CUDA installation, pytorch installation, and GPU available.
-Please reference (Pythorch's)[https://pytorch.org/] documentation in order to achieve this.
+Please reference [Pythorch's](https://pytorch.org/) documentation in order to achieve this.
 
 ## Installation
 
@@ -37,7 +37,7 @@ python setup.py install
 
 Pytorch provides an excellent set of general programming abstractions for writing high level code to execute on both CPU & GPU.
 However, these abstractions do not provide the flexibility required to implement certain computations efficiently on the GPU.
-In order to mitigate a significant bottleneck, we provide a cuda implementation and use a (c++/cuda extension)[https://pytorch.org/tutorials/advanced/cpp_extension.html] to integrate it with pytorch.
+In order to mitigate a significant bottleneck, we provide a cuda implementation and use a [c++/cuda extension](https://pytorch.org/tutorials/advanced/cpp_extension.html) to integrate it with pytorch.
 To enable use of this feature, an additional argument ```--with-extension``` must be added while invoking the installation script
 
 ```python setup.py install --with-extension```
