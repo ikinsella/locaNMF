@@ -3,10 +3,34 @@ from abc import abstractmethod
 import torch
 import numpy as np
 
-import cuhals
+try:
+    import cuhals
+    use_cuhals = True
+except ImportError:
+    use_cuhals = False
 
 from base import VideoFactorizer
 from factor import TensorFactor
+
+def native_update(Beta,
+                  Delta,
+                  Sigma,
+                  nonnegative=True,
+                  batch=None):
+    """ Native Pytorch Implementation Of HALS Update """
+    # TODO Implement Batching To Mitigate GPU Bottleneck
+    for ndx in range(Beta.shape[0]):
+        tmp_scale = 1.0 / Sigma[ndx, ndx].item()
+        torch.addmv(Delta[ndx],
+                    Beta.t(),
+                    Sigma[ndx],
+                    alpha=-1 * tmp_scale,
+                    beta=tmp_scale,
+                    out=Delta[ndx])
+        Beta[ndx].add_(Delta[ndx])
+        if nonnegative:
+            torch.nn.functional.relu(Beta[ndx],
+                                     inplace=True)
 
 
 class SpatialHals():
@@ -16,11 +40,18 @@ class SpatialHals():
                         batch=32,
                         **kwargs):
         """ Fast Hals Update Of Spatial Components """
-        cuhals.update(self.spatial.data,
-                      self.spatial.scratch,
-                      self.covariance.data,
-                      nonnegative,
-                      batch)
+        if use_cuhals:
+            cuhals.update(self.spatial.data,
+                          self.spatial.scratch,
+                          self.covariance.data,
+                          nonnegative,
+                          batch)
+        else:
+            native_update(self.spatial.data,
+                          self.spatial.scratch,
+                          self.covariance.data,
+                          nonnegative,
+                          batch)
 
 
 class TemporalHals():
@@ -30,11 +61,18 @@ class TemporalHals():
                          batch=32,
                          **kwargs):
         """ Fast Hals Update Of Temporal Components """
-        cuhals.update(self.temporal.data,
-                      self.temporal.scratch,
-                      self.covariance.data,
-                      nonnegative,
-                      batch)
+        if use_cuhals:
+            cuhals.update(self.temporal.data,
+                          self.temporal.scratch,
+                          self.covariance.data,
+                          nonnegative,
+                          batch)
+        else:
+            native_update(self.temporal.data,
+                          self.temporal.scratch,
+                          self.covariance.data,
+                          nonnegative,
+                          batch)
 
 
 class TemporalLS():
