@@ -16,13 +16,13 @@ The following lines will create a new environment with the required dependencies
 conda create -n locaNMF python=3 numpy scipy scikit-learn
 conda activate locaNMF
 ```
-when the preceeding installation is completed, you must also follow [Pythorch's](https://pytorch.org/) installation instructions.
+when the preceeding installation is completed, you must also follow [Pytorch's](https://pytorch.org/) installation instructions.
 
 ### Enabling GPU Support
 
 LocaNMF is implemented using pytorch in order to take advantage of abstractions that allows us to provide one implementation that is capable of being run using either CPUs or GPUs. 
 To enable the use of your GPU you must have a a compatible CUDA installation, pytorch installation, and GPU available.
-Please reference [Pythorch's](https://pytorch.org/) documentation in order to achieve this.
+Please reference [Pytorch's](https://pytorch.org/) documentation in order to achieve this.
 
 ## Installation
 
