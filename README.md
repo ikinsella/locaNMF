@@ -8,12 +8,13 @@
 - numpy
 - scipy
 - sklearn
+- matplotlib
 - pytorch
 
 We encourage the use of conda to manage the dependencies for LocaNMF in it's own environment. 
 The following lines will create a new environment with the required dependencies:
 ```
-conda create -n locaNMF python=3 numpy scipy scikit-learn
+conda create -n locaNMF python=3 numpy scipy scikit-learn matplotlib
 conda activate locaNMF
 ```
 when the preceeding installation is completed, you must also follow [Pytorch's](https://pytorch.org/) installation instructions.
