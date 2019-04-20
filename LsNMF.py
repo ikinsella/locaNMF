@@ -203,7 +203,7 @@ def rank_linesearch(low_rank_video,
         # Increment K For Each Region Below r^2 thresh
         for rdx, (rank, max_rank) in enumerate(zip(curr_ranks, max_ranks)):
             if rank < max_rank:
-                refit_flags[rdx] = evaluate_fit_to_region(low_rank_video,
+                refit_flags[rdx],_ = evaluate_fit_to_region(low_rank_video,
                                                           nmf_factors,
                                                           region_metadata.support.data[rdx],
                                                           **kwargs)
@@ -292,7 +292,8 @@ def evaluate_fit_to_region(low_rank_video,
                                             region_idx).t(),
                     mat2=video_factorization.temporal.data,
                     out=mov)
-    return 1 - (torch.mean(mov.pow_(2)).item() / var.item()) < r2_thresh
+    r2_est = 1 - (torch.mean(mov.pow_(2)).item() / var.item())
+    return r2_est < r2_thresh, r2_est
 
 
 def lambda_linesearch(video,
