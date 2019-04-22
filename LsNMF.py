@@ -150,6 +150,7 @@ def rank_linesearch(low_rank_video,
                                  region_factors[-1],
                                  rank_range[0],
                                  verbose=verbose[-1],
+                                 device=device,
                                  **kwargs)
         curr_ranks.append(len(region_factors[-1]))
 
@@ -164,7 +165,7 @@ def rank_linesearch(low_rank_video,
     refit_flags = [False] * len(region_lr_videos)
     for itr in range(maxiter_rank):
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|--v Rank Line Search Iteration {}'.format(itr))
             print(indent + '|  |--v Initialization')
             itr_t0 = time()
@@ -178,12 +179,13 @@ def rank_linesearch(low_rank_video,
                                          len(region_factors[rdx]) + rank_range[-1],
                                          verbose=verbose[-1],
                                          indent=indent+'|  |  ',
+                                         device=device,
                                          **kwargs)
                 curr_ranks[rdx] += 1
                 refit_flags[rdx] = False
         nmf_factors.set_from_regions(region_factors, region_metadata)
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |  \'-total : %f seconds' % (time()-step_t0))
             print(indent + '|  |--v Lambda Line Search')
             step_t0 = time()
@@ -194,9 +196,10 @@ def rank_linesearch(low_rank_video,
                                          nmf_factors,
                                          verbose=verbose[1:],
                                          indent=indent + '|  |  ',
+                                         device=device,
                                          **kwargs)
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |  \'- {:g} iterations took {:g} seconds'.format(lambda_iters, time()-step_t0))
             step_t0 = time()
 
@@ -208,12 +211,12 @@ def rank_linesearch(low_rank_video,
                                                           region_metadata.support.data[rdx],
                                                           **kwargs)
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |--> R2 Evaluation took {:g} seconds'.format(time()-step_t0))
 
         # Update Progress
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  \'-total : {:g} seconds'.format(time()-itr_t0))
         if not np.any(refit_flags):
             break
@@ -225,6 +228,7 @@ def init_from_low_rank_video(low_rank_video,
                              num_components,
                              verbose=False,
                              indent='',
+                             device='cuda',
                              **kwargs):
     """ Initialize Region Using NMF On Low Rank Approx """
     factorization.num_components = num_components
@@ -239,6 +243,7 @@ def init_from_low_rank_video(low_rank_video,
          verbose=verbose,
          indent=indent+'|  ',
          nnt=False,
+         device=device,
          **kwargs)
 
 
@@ -305,6 +310,7 @@ def lambda_linesearch(video,
                       maxiter_lambda=15,
                       verbose=False,
                       indent='',
+                      device='cuda',
                       **kwargs):
     """Tune Lambdas Until Components Are Sufficiently Region-Localized"""
     # Parse Args
@@ -318,7 +324,7 @@ def lambda_linesearch(video,
     breakout = False
     for itr in range(maxiter_lambda):
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|--v Lambda Line Search Iteration {:g}'.format(itr+1))
             itr_t0 = time()
             step_t0 = itr_t0
@@ -328,7 +334,7 @@ def lambda_linesearch(video,
                   .5 * localized_factorization.lambdas.data[..., None],
                   out=localized_factorization.distance.scratch)
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |--> Setting Distmat took {:g} seconds'.format(time()-step_t0))
             print(indent + '|  |--v HALS Iterations')
             step_t0 = time()
@@ -338,9 +344,10 @@ def lambda_linesearch(video,
                           localized_factorization,
                           verbose=verbose[-1],
                           indent=indent+'|  |  ',
+                          device=device,
                           **kwargs)
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |  \'- {:g} iterations took : {:g} seconds'.format(hals_iters, time()-step_t0))
             step_t0 = time()
 
@@ -371,12 +378,12 @@ def lambda_linesearch(video,
         else:
             breakout = True
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |--> Lambda update took {:g} seconds'.format(time()-step_t0))
 
         # Update Progress
         if verbose[0]:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  \'-total : {:g} seconds'.format(time()-itr_t0))
         if breakout:
             break
@@ -389,11 +396,12 @@ def hals(video,
          maxiter_hals=30,
          verbose=False,
          indent='',
+         device='cuda',
          **kwargs):
     """ Perform maxiter HALS updates To Temporal & Spatial Components """
     for itr in range(maxiter_hals):
         if verbose:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|--v HALS Iteration {:g}'.format(itr+1))
             itr_t0 = time()
             step_t0 = itr_t0
@@ -401,7 +409,7 @@ def hals(video,
         # Spatial Update Step
         video_factorization.update_spatial(video)
         if verbose:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |--> Spatial update took {:g} seconds'.format(time()-step_t0))
             step_t0 = itr_t0
 
@@ -409,14 +417,14 @@ def hals(video,
         video_factorization.prune_empty_components()
         video_factorization.normalize_spatial()
         if verbose:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |--> Component prune took {:g} seconds'.format(time()-step_t0))
             step_t0 = itr_t0
 
         # Temporal Update Step
         video_factorization.update_temporal(video, nonnegative=False)
         if verbose:
-            torch.cuda.synchronize()
+            if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |--> Temporal update took {:g} seconds'.format(time()-step_t0))
             print(indent + '|  \'-total : {:g} seconds'.format(time()-itr_t0))
 
