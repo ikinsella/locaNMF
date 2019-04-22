@@ -21,7 +21,7 @@ def adaptive_fit(video_mats,
                  rank_range=(2, 14, 1),
                  device='cuda',
                  **kwargs):
-    """ Perform LsNMF Of A Low Rank Video With Automated Param Tuning """
+    """ Perform LocaNMF Of A Low Rank Video With Automated Param Tuning """
     # Create Region Metadata
     region_mats = extract_region_metadata(valid_mask,
                                           region_map,
