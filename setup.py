@@ -12,7 +12,7 @@ if '--with-extension' in sys.argv:
     ext_modules.append(
         CUDAExtension('cuhals',
                       ['cuhals.cpp', 'cuhals_kernels.cu'],
-                      extra_compile_args={'cxx': ["-fopenmp"],
+                      extra_compile_args={'cxx': ["-fopenmp", "-I"+INCLUDE_DIRS[0]],
                                           'nvcc': []}))
     sys.argv.remove('--with-extension')
 
