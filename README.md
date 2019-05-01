@@ -3,7 +3,7 @@
 The recommended way to use LocaNMF 
 is through prebuilt [Docker](https://www.docker.com/why-docker) container which contains 
 both LocaNMF and all of its 
-dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/README-docker.md) to use 
+dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/blob/container/README-docker.md) to use 
 the prebuilt Docker container. 
 
 The following describes how to install this software from source.
