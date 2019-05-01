@@ -1,5 +1,12 @@
 # LocaNMF
 
+The recommended way to use LocaNMF 
+is through prebuilt [Docker](https://www.docker.com/why-docker) container which contains 
+both LocaNMF and all of its 
+dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/README-docker.md) to use 
+the prebuilt Docker container. 
+
+The following describes how to install this software from source.
 
 
 ## Dependencies
@@ -10,6 +17,8 @@
 - sklearn
 - matplotlib
 - pytorch
+- mkl
+- mkl-include
 
 We encourage the use of conda to manage the dependencies for LocaNMF in it's own environment. 
 The following lines will create a new environment with the required dependencies:
@@ -17,7 +26,8 @@ The following lines will create a new environment with the required dependencies
 conda create -n locaNMF python=3 numpy scipy scikit-learn matplotlib mkl mkl-include
 conda activate locaNMF
 ```
-when the preceeding installation is completed, you must also follow [Pytorch's](https://pytorch.org/) installation instructions.
+when the preceeding installation is completed, you must also follow [Pytorch's](https://pytorch.org/) 
+installation instructions to install Pytorch.
 
 ### Enabling GPU Support
 
