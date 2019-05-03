@@ -1,13 +1,13 @@
 # LocaNMF
 
-The recommended way to use LocaNMF 
-is through prebuilt [Docker](https://www.docker.com/why-docker) container which contains 
+The following describes how to install LocaNMF using conda. User can choose whether to enable 
+GPU for acceleration.
+
+The alternative way to use LocaNMF 
+is through prebuilt [Docker](https://www.docker.com/why-docker) image which contains 
 both LocaNMF and all of its 
 dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/blob/container/README-docker.md) to use 
-the prebuilt Docker container. 
-
-The following describes how to install this software from source.
-
+the prebuilt Docker image. 
 
 ## Dependencies
 
@@ -27,13 +27,19 @@ conda create -n locaNMF python=3 numpy scipy scikit-learn matplotlib mkl mkl-inc
 conda activate locaNMF
 ```
 when the preceeding installation is completed, you must also follow [Pytorch's](https://pytorch.org/) 
-installation instructions to install Pytorch.
+installation instructions to install PyTorch. 
 
-### Enabling GPU Support
+```
+# Without GPU acceleration
+conda install pytorch-cpu torchvision-cpu -c pytorch
+# Or with GPU acceleration
+conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
+```
 
-LocaNMF is implemented using pytorch in order to take advantage of abstractions that allows us to provide one implementation that is capable of being run using either CPUs or GPUs. 
-To enable the use of your GPU you must have a a compatible CUDA installation, pytorch installation, and GPU available.
-Please reference [Pytorch's](https://pytorch.org/) documentation in order to achieve this.
+LocaNMF is implemented using pytorch in order to take advantage of abstractions that allows us to provide one implementation 
+that is capable of being run using either CPU or GPU. 
+To enable the use of your GPU you must have a compatible GPU, **CUDA** and pytorch installation.
+Please reference [CUDA](https://developer.nvidia.com/cuda-zone) documentation in order to install CUDA.
 
 ## Installation
 
