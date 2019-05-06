@@ -1,9 +1,22 @@
 # LocaNMF
 
-The following describes how to install LocaNMF using conda. User can choose whether to enable 
-GPU for acceleration.
+LocaNMF toolkit (Localized semi-Nonnegative Matrix Factorization) can eﬃciently decompose wideﬁeld video 
+data and allows user to directly compare activity across multiple mice by outputting mouse-speciﬁc 
+localized functional regions. LocaNMF uses a fast low-rank version of Hierarchical Alternating Least 
+Squares (HALS), and outputs components that are signiﬁcantly more interpretable than more traditional NMF
+or SVD-based techniques.
+ 
+It is written in Python and C++, built on top of PyTorch and can run on both CPU and Nvidia GPU. 
+The following describes how to install LocaNMF using conda.
 
-The alternative way to use LocaNMF 
+
+<!--User can choose to run LocaNMF on either CPU or GPU by installing 
+CPU or GPU version PyTorch. However, user can choose to run LocaNMF on CPU by setting parameters in LocaNMF
+even though GPU version PyTorch is installed. User can choose whether to enable GPU for acceleration. -->
+
+
+Due to the complexity of installing Nvidia graphic driver and CUDA toolkit, 
+an alternative way to use LocaNMF with Nvidia GPU 
 is through prebuilt [Docker](https://www.docker.com/why-docker) image which contains 
 both LocaNMF and all of its 
 dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/blob/container/README-docker.md) to use 
@@ -20,26 +33,33 @@ the prebuilt Docker image.
 - mkl
 - mkl-include
 
-We encourage the use of conda to manage the dependencies for LocaNMF in it's own environment. 
-The following lines will create a new environment with the required dependencies:
+It is recommended to use [conda](https://docs.conda.io/en/latest/miniconda.html) to manage the 
+dependencies for LocaNMF in it's own environment. First, install conda or miniconda and then 
+create a new environment for LocaNMF with the required dependencies:
 ```
 conda create -n locaNMF python=3 numpy scipy scikit-learn matplotlib mkl mkl-include
 conda activate locaNMF
 ```
-when the preceeding installation is completed, you must also follow [Pytorch's](https://pytorch.org/) 
-installation instructions to install PyTorch. 
-
+When the proceeding installation is completed, [PyTorch](https://pytorch.org/) 
+needs to be installed. LocaNMF is implemented using PyTorch in order to take 
+advantage of abstractions that allows us to provide one implementation 
+that is capable of being run using either CPU or GPU. Use either command below to properly install PyTorch.
+Other version of CUDA toolkit may be installed basing on [PyTorch](https://pytorch.org/).
 ```
 # Without GPU acceleration
 conda install pytorch-cpu torchvision-cpu -c pytorch
-# Or with GPU acceleration
+# Or with GPU acceleration 
 conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
 ```
 
-LocaNMF is implemented using pytorch in order to take advantage of abstractions that allows us to provide one implementation 
-that is capable of being run using either CPU or GPU. 
-To enable the use of your GPU you must have a compatible GPU, **CUDA** and pytorch installation.
-Please reference [CUDA](https://developer.nvidia.com/cuda-zone) documentation in order to install CUDA.
+To enable the use of Nvidia GPU you must have a compatible Nvidia GPU, Nvidia graphics driver, **CUDA** 
+and PyTorch installation.
+Please reference [CUDA](https://developer.nvidia.com/cuda-zone) documentation in order to install Nvidia
+graphics driver and CUDA.
+
+
+
+<!--TODO: -->
 
 ## Installation
 
