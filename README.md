@@ -19,7 +19,7 @@ Due to the complexity of installing Nvidia graphic driver and CUDA toolkit,
 an alternative way to use LocaNMF with Nvidia GPU 
 is through the prebuilt [Docker](https://www.docker.com/why-docker) image which contains 
 both LocaNMF and all of its 
-dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/blob/container/README-docker.md) to use 
+dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/blob/master/README-docker.md) to use 
 the prebuilt Docker image. 
 
 ## Dependencies
