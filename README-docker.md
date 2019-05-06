@@ -109,13 +109,13 @@ docker run --runtime=nvidia --rm nvidia/cuda:10.1-base nvidia-smi
 The official LocaNMF Docker image is called `loca_nmf`. First, pull the docker image,
 
 ```
-docker pull jw3132/locanmf:latest
+docker pull jw3132/locanmf:1.0
 ```
 
 Run the docker image as,
 
 ```
-docker run --runtime=nvidia -it -p 8888:8888 -v $PWD:/mnt/data jw3132/locanmf:latest bash
+docker run --runtime=nvidia -it -p 8888:8888 -v $PWD:/mnt/data -w /root jw3132/locanmf:1.0 bash
 ```
 
 This will export docker container port 8888 (jupyter lab port) to host port 8888, 
@@ -124,9 +124,9 @@ mount current working
 LocaNMF and all dependency have already been installed. In the terminal, LocaNMF can be used as
 normal python package. 
 
-Jupyterlab-lab server can be started by
-
+Jupyterlab-lab server can be started by executing the following,
 ```
+cd /root
 jupyter-lab --no-browser --ip 0.0.0.0 --allow-root &
 ```
 
