@@ -17,7 +17,7 @@ even though GPU version PyTorch is installed. User can choose whether to enable 
 
 Due to the complexity of installing Nvidia graphic driver and CUDA toolkit, 
 an alternative way to use LocaNMF with Nvidia GPU 
-is through prebuilt [Docker](https://www.docker.com/why-docker) image which contains 
+is through the prebuilt [Docker](https://www.docker.com/why-docker) image which contains 
 both LocaNMF and all of its 
 dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/blob/container/README-docker.md) to use 
 the prebuilt Docker image. 
@@ -63,18 +63,24 @@ graphics driver and CUDA.
 
 ## Installation
 
-With your conda environment active and dependencies installed, you can install locaNMF by cloning the repository and running the installation script
+With your conda environment active and dependencies installed, you can install locaNMF by cloning the repository and 
+running the installation script
 ```
 git clone https://github.com/ikinsella/locaNMF.git
 cd locaNMF
 python setup.py install
 ```
+LocaNMF is ready to run on CPU or GPU basing on the PyTorch version installed above. 
+Please follow the demo notebook in the current folder to try out LocaNMF.
+
 
 ## (OPTIONAL) Compiling The Cuda Extension
 
-Pytorch provides an excellent set of general programming abstractions for writing high level code that can use both CPUs & GPUs.
+This section is optional and for computation performance benefit. 
+PyTorch provides an excellent set of general programming abstractions for writing high level code that can use both CPUs & GPUs.
 However, these abstractions do not provide the flexibility required to implement certain computations efficiently on the GPU.
-In order to mitigate a significant bottleneck, we provide a cuda implementation and use a [c++/cuda extension](https://pytorch.org/tutorials/advanced/cpp_extension.html) to integrate it with pytorch.
+In order to mitigate a significant bottleneck, we provide a cuda implementation and use a 
+[c++/cuda extension](https://pytorch.org/tutorials/advanced/cpp_extension.html) to integrate it with PyTorch.
 To enable use of this feature, an additional argument ```--with-extension``` must be added while invoking the installation script
 
 ```python setup.py install --with-extension```
