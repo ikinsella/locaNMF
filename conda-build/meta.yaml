@@ -1,0 +1,39 @@
+package:
+  name: locanmf
+  version: "1.0"
+
+source:
+  path: ../
+
+build:
+  number: 0
+  
+requirements:
+  build:
+    - python
+    - numpy
+    - scipy
+    - scikit-learn
+    - matplotlib
+    - mkl=2018
+    - mkl-include=2018
+
+
+  run:
+    - python
+    - numpy
+    - scipy
+    - scikit-learn
+    - matplotlib
+    - mkl=2018
+    - mkl-include=2018
+
+test:
+  imports:
+    - locanmf.LocaNMF
+
+about:
+  home: https://github.com/ikinsella/locaNMF
+  license: GPL
+  license_family: GPL3
+  license_file: LICENSE
