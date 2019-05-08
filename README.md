@@ -33,6 +33,14 @@ the prebuilt Docker image.
 - mkl
 - mkl-include
 
+
+**start here:
+
+TODO: pytorch only requires nvidia driver, doesn't require to install cuda. !!
+```
+conda create -n locanmf python=3.6 locanmf -c jw3132 -c pytorch
+```
+
 It is recommended to use [conda](https://docs.conda.io/en/latest/miniconda.html) to manage the 
 dependencies for LocaNMF in it's own environment. First, install conda or miniconda and then 
 create a new environment for LocaNMF with the required dependencies:
