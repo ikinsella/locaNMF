@@ -15,8 +15,8 @@ requirements:
     - scipy
     - scikit-learn
     - matplotlib
-    - mkl=2018
-    - mkl-include=2018
+    - mkl
+    - mkl-include
     - pytorch
 
   run:
@@ -25,8 +25,8 @@ requirements:
     - scipy
     - scikit-learn
     - matplotlib
-    - mkl=2018
-    - mkl-include=2018
+    - mkl
+    - mkl-include
     - pytorch
 
 test:
