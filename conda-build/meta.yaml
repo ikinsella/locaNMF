@@ -10,7 +10,7 @@ build:
   
 requirements:
   build:
-    - python
+    - python=3.6
     - numpy
     - scipy
     - scikit-learn
@@ -18,9 +18,10 @@ requirements:
     - mkl
     - mkl-include
     - pytorch
+    - torchvision
 
   run:
-    - python
+    - python=3.6
     - numpy
     - scipy
     - scikit-learn
@@ -28,6 +29,7 @@ requirements:
     - mkl
     - mkl-include
     - pytorch
+    - torchvision
 
 test:
   imports:
