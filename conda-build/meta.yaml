@@ -19,6 +19,7 @@ requirements:
     - mkl-include
     - pytorch
     - torchvision
+    - jupyterlab
 
   run:
     - python=3.6
@@ -30,6 +31,7 @@ requirements:
     - mkl-include
     - pytorch
     - torchvision
+    - jupyterlab
 
 test:
   imports:

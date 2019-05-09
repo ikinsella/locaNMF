@@ -3,71 +3,74 @@
 LocaNMF toolkit (Localized semi-Nonnegative Matrix Factorization) can eﬃciently decompose wideﬁeld video 
 data and allows user to directly compare activity across multiple mice by outputting mouse-speciﬁc 
 localized functional regions. LocaNMF uses a fast low-rank version of Hierarchical Alternating Least 
-Squares (HALS), and outputs components that are signiﬁcantly more interpretable than more traditional NMF
+Squares (HALS), and outputs components that are signiﬁcantly more interpretable than traditional NMF
 or SVD-based techniques.
  
-It is written in Python and C++, built on top of PyTorch and can run on both CPU and Nvidia GPU. 
-The following describes how to install LocaNMF using conda.
+It is built on top of PyTorch, written in Python and C++, and is capable to run on either CPU or
+Nvidia CUDA-enabled GPU. To run LocaNMF on Nvidia GPU, a Nvidia 
+[CUDA-enabled GPU](https://developer.nvidia.com/cuda-gpus) 
+is required and the latest version 
+[Nvidia Driver](https://www.nvidia.com/Download/index.aspx?lang=en-us) 
+is required to be properly installed before installing LocaNMF software.
 
+## Install
 
-<!--User can choose to run LocaNMF on either CPU or GPU by installing 
-CPU or GPU version PyTorch. However, user can choose to run LocaNMF on CPU by setting parameters in LocaNMF
-even though GPU version PyTorch is installed. User can choose whether to enable GPU for acceleration. -->
+It is recommended to use [conda](https://www.anaconda.com/) to manage the 
+dependencies for LocaNMF in it's own Python environment.
+First, download and install [conda](https://www.anaconda.com/distribution/). Verify conda installation
+by executing the following scripts. A list of base environment packages will be displayed.
+```
+conda list
+```
 
-
-Due to the complexity of installing Nvidia graphic driver and CUDA toolkit, 
-an alternative way to use LocaNMF with Nvidia GPU 
-is through the prebuilt [Docker](https://www.docker.com/why-docker) image which contains 
-both LocaNMF and all of its 
-dependency. Follow this [guide](https://github.com/ikinsella/locaNMF/blob/master/README-docker.md) to use 
-the prebuilt Docker image. 
-
-## Dependencies
-
-- python3
-- numpy
-- scipy
-- sklearn
-- matplotlib
-- pytorch
-- mkl
-- mkl-include
-
-
-**start here:
-
-TODO: pytorch only requires nvidia driver, doesn't require to install cuda. !!
+<!-- pytorch only requires nvidia driver, doesn't require to install cuda. -->
+Create a new environment for LocaNMF and install LocaNMF software and all of its dependencies.
 ```
 conda create -n locanmf python=3.6 locanmf -c jw3132 -c pytorch
 ```
 
-It is recommended to use [conda](https://docs.conda.io/en/latest/miniconda.html) to manage the 
-dependencies for LocaNMF in it's own environment. First, install conda or miniconda and then 
-create a new environment for LocaNMF with the required dependencies:
+## Use LocaNMF
+
+Activate `locanmf` conda environment.
 ```
-conda create -n locaNMF python=3 numpy scipy scikit-learn matplotlib mkl mkl-include
-conda activate locaNMF
-```
-When the proceeding installation is completed, [PyTorch](https://pytorch.org/) 
-needs to be installed. LocaNMF is implemented using PyTorch in order to take 
-advantage of abstractions that allows us to provide one implementation 
-that is capable of being run using either CPU or GPU. Use either command below to properly install PyTorch.
-Other version of CUDA toolkit may be installed basing on [PyTorch](https://pytorch.org/).
-```
-# Without GPU acceleration
-conda install pytorch-cpu torchvision-cpu -c pytorch
-# Or with GPU acceleration 
-conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
+conda activate locanmf
 ```
 
-To enable the use of Nvidia GPU you must have a compatible Nvidia GPU, Nvidia graphics driver, **CUDA** 
-and PyTorch installation.
-Please reference [CUDA](https://developer.nvidia.com/cuda-zone) documentation in order to install Nvidia
-graphics driver and CUDA.
+To test the proper installation of LocaNMF software, execute the following script.
+```
+python
+from locanmf import LocaNMF
+LocaNMF.version()
+```
+
+The following output will be displayed. It implies that LocaNMF and its dependencies have been 
+properly installed.
+```
+python
+Python 3.6.8 |Anaconda, Inc.| (default, Dec 30 2018, 01:22:34) 
+[GCC 7.3.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from  locanmf import LocaNMF
+>>> LocaNMF.version()
+version = 1.0
+>>>
+```
+
+Please download the **demo** folder in this repository to your computer and 
+walk through the `demo_simulation.ipynb` notebook to try out the software. 
+
+To run the notebook, in terminal, change directory to the downloaded **demo** folder,
+then execute,
+```
+jupyter-lab &
+```
+to start jupyter-lab server. In the pop-out web browser, double-click the notebook to open it.
+The code is editable and can be run cell by cell by pressing "shift + enter".
 
 
 
-<!--TODO: -->
+
+<!--TODO: 
 
 ## Installation
 
@@ -112,3 +115,5 @@ A known issue is that the ```nvcc``` compiler from Cuda 9.0 requires the availab
 In order to avoid compatibility issues, you should create a symbolic link to a compatible ```gcc``` into directory containing ```nvcc``` 
 For example, if you wish to use ```gcc-5``` (recommended) you would use the line 
 ```ln -s /usr/bin/gcc-5 /path/to/cuda-9.0/bin/gcc```.
+
+-->

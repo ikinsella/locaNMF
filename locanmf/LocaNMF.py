@@ -429,3 +429,8 @@ def hals(video,
             print(indent + '|  \'-total : {:g} seconds'.format(time()-itr_t0))
 
     return itr + 1
+
+def version():
+    print('version = 1.0')
+
+
