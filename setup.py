@@ -4,7 +4,7 @@ import setuptools
 # from setuptools import setup
 from torch.utils.cpp_extension import CUDAExtension, BuildExtension
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf8") as fh:
     long_description = fh.read()
 
 ENV = os.environ["CONDA_PREFIX"]  # Absolute path of active conda env root

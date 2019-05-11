@@ -10,7 +10,7 @@ It is built on top of PyTorch, written in Python and C++, and is capable to run 
 Nvidia CUDA-enabled GPU. To run LocaNMF on Nvidia GPU, a Nvidia 
 [CUDA-enabled GPU](https://developer.nvidia.com/cuda-gpus) 
 is required and the latest version 
-[Nvidia Driver](https://www.nvidia.com/Download/index.aspx?lang=en-us) 
+[Nvidia Driver](https://www.nvidia.com/Download/index.aspx?lang=en-us) (version > 418.x)
 is required to be properly installed before installing LocaNMF software.
 
 ## Install
