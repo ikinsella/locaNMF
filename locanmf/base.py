@@ -2,9 +2,16 @@ from abc import ABCMeta, abstractmethod
 
 
 class FactorCollection(metaclass=ABCMeta):
-    """ ABC For Managing Factor/Buffer Lifetime & Manipulation """
+    """ABC For Managing Factor/Buffer Lifetime & Manipulation """
+
     def __init__(self, max_num_components, device):
-        """ Set Object Attributes """
+        """ Set Object Attributes
+
+        Parameter:
+            max_num_components: maximum number of components
+            device: computation device
+
+        """
         self._max_components = max_num_components
         self._num_components = max_num_components
         self._device = device
@@ -14,12 +21,26 @@ class FactorCollection(metaclass=ABCMeta):
 
     @property
     def num_components(self):
-        """ Number of active compnents in each factor """
+        """ Number of active compnents in each factor
+
+        Return:
+            _num_components
+        """
+
         return self._num_components
 
     @num_components.setter
     def num_components(self, new_value):
-        """ Change the number of factors, modifying tensors accoringly """
+        """ Change the number of factors, modifying tensors accordingly
+
+        Parameter:
+            new_value: new number of components
+
+        Return:
+            ValueError
+
+        """
+
         if new_value == self.__len__():
             return None
         elif 0 < new_value <= self._max_components:
@@ -33,7 +54,13 @@ class FactorCollection(metaclass=ABCMeta):
 
     @property
     def device(self):
-        """ ID, string, or wrapper for the device hosting the factors """
+        """ ID, string, or wrapper for the device hosting the factors
+
+        Return:
+            _device:
+
+        """
+
         return self._device
 
     @abstractmethod
@@ -49,6 +76,7 @@ class FactorCollection(metaclass=ABCMeta):
 
 class VideoMixin(metaclass=ABCMeta):
     """ Abstract Mixin To Force Behavior Like A Video"""
+
     @property
     @abstractmethod
     def fov(self):
@@ -68,7 +96,8 @@ class VideoMixin(metaclass=ABCMeta):
 
 
 class VideoWrapper(FactorCollection, VideoMixin):
-    """ """
+    """ Video Wrapper """
+
     @abstractmethod
     def forward(self, spatial, temporal, **kwargs):
         """ Computes tensor_like(C) = matmul(tensor_like(A), Y) """
@@ -85,12 +114,22 @@ class VideoFactorizer(FactorCollection, VideoMixin):
 
     @property
     def fov(self):
-        """ Shape of the field of view in pixels/voxels """
+        """ Shape of the field of view in pixels/voxels
+
+        Return:
+            Shape of the field of view in pixels/voxels
+
+        """
         return self.spatial.shape[1:]
 
     @property
     def frames(self):
-        """ Length of the video in frames """
+        """ Length of the video in frames
+
+        Return:
+            Length of the video in frames
+
+        """
         return self.temporal.shape[1:]
 
     @abstractmethod

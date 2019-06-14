@@ -17,7 +17,17 @@ def native_update(Beta,
                   Sigma,
                   nonnegative=True,
                   batch=None):
-    """ Native Pytorch Implementation Of HALS Update """
+    """ Native Pytorch Implementation Of HALS Update
+
+    Parameter:
+        Beta:
+        Delta:
+        Sigma:
+        nonnegative:
+        batch: batch size
+
+    """
+
     # TODO Implement Batching To Mitigate GPU Bottleneck
     for ndx in range(Beta.shape[0]):
         tmp_scale = 1.0 / Sigma[ndx, ndx].item()
@@ -35,11 +45,21 @@ def native_update(Beta,
 
 class SpatialHals():
     """ Mixin Class Carrying 'private' Spatial HALS Update """
+
     def _spatial_update(self,
                         nonnegative=True,
                         batch=32,
                         **kwargs):
-        """ Fast Hals Update Of Spatial Components """
+        """ Fast Hals Update Of Spatial Components
+
+        Parameter:
+            nonnegative:
+            batch: batch size
+            **kwargs: list of optional input arguments
+
+        """
+
+
         if use_cuhals:
             cuhals.update(self.spatial.data,
                           self.spatial.scratch,
@@ -56,11 +76,20 @@ class SpatialHals():
 
 class TemporalHals():
     """ Mixin Class Carrying 'private' Temporal HALS Update """
+
     def _temporal_update(self,
                          nonnegative=True,
                          batch=32,
                          **kwargs):
-        """ Fast Hals Update Of Temporal Components """
+        """ Fast Hals Update Of Temporal Components
+
+        Parameter:
+            nonnegative:
+            batch: batch size
+            **kwargs: list of optional input arguments
+
+        """
+
         if use_cuhals:
             cuhals.update(self.temporal.data,
                           self.temporal.scratch,
@@ -77,8 +106,15 @@ class TemporalHals():
 
 class TemporalLS():
     """ Mixin Class Carrying 'private' Temporal LS Update """
+
     def _temporal_update(self, **kwargs):
-        """ Least Squares Update Of Temporal Components """
+        """ Least Squares Update Of Temporal Components
+
+        Parameter:
+            **kwargs: list of optional input arguments
+
+        """
+
         torch.inverse(self.covariance.data,
                       out=self.covariance.data)
         torch.matmul(self.covariance.data,
@@ -88,11 +124,20 @@ class TemporalLS():
 
 class BaseNMF(VideoFactorizer):
     """ Manages Factor/Buffer Lifetime & Manipulation For HALS NMF """
+
     def __init__(self,
                  max_num_components,
                  video_shape,
                  device='cuda'):
-        """ allocate neccesary buffers """
+        """ Allocate necessary buffers
+
+        Parameter:
+            max_num_components: maximum number of components
+            video_shape: shape of video input
+            device: computation device
+
+        """
+
         super().__init__(max_num_components, device)
         self.spatial = TensorFactor((self.num_components, video_shape[0]),
                                     scratch=True,
@@ -117,7 +162,13 @@ class BaseNMF(VideoFactorizer):
                                   dtype=torch.long)
 
     def _resize(self, num_components):
-        """ Resize each factor axis inplace to represent N components """
+        """ Resize each factor axis inplace to represent N components
+
+        Parameter:
+            num_components: number of components
+
+        """
+
         self.spatial.resize_axis_(0, num_components)
         self.temporal.resize_axis_(0, num_components)
         self.intermediate.resize_axis_(1, num_components)
@@ -126,12 +177,24 @@ class BaseNMF(VideoFactorizer):
         self.index.resize_axis_(0, num_components)
 
     def permute(self, permutation):
-        """ Reorder component in factors according to provided permutation """
+        """ Reorder component in factors according to provided permutation
+
+        Parameter:
+            permutation: permutation order
+
+        """
+
         self.spatial.permute_(permutation)
         self.temporal.permute_(permutation)
 
     def prune_empty_components(self, p_norm=2):
-        """ Remove components with spatial empty factors """
+        """ Remove components with spatial empty factors
+
+        Parameter:
+            p_norm: component index to be pruned
+
+        """
+
         torch.norm(self.spatial.data,
                    p=p_norm,
                    dim=-1,
@@ -148,7 +211,14 @@ class BaseNMF(VideoFactorizer):
             self.num_components = nnz
 
     def _spatial_precompute(self, video_wrapper, **kwargs):
-        """ Precompute Sigma, Delta For Use In Spatial Update """
+        """ Precompute Sigma, Delta For Use In Spatial Update
+
+        Parameter:
+            video_wrapper:
+            **kwargs: list of optional input arguments
+
+        """
+
         # Sigma = A'A
         torch.matmul(self.temporal.data,
                      self.temporal.data.t(),
@@ -165,12 +235,25 @@ class BaseNMF(VideoFactorizer):
         ...
 
     def update_spatial(self, video_wrapper, **kwargs):
-        """ Perform the HALS update of the spatial factor """
+        """ Perform the HALS update of the spatial factor
+
+        Parameter:
+            video_wrapper:
+            **kwargs: list of optional input arguments
+
+        """
+
         self._spatial_precompute(video_wrapper, **kwargs)
         self._spatial_update(**kwargs)
 
     def normalize_spatial(self, p_norm=float('inf')):
-        """ Scale each spatial component to have unit p-norm """
+        """ Scale each spatial component to have unit p-norm
+
+        Parameter:
+            p_norm:
+
+        """
+
         torch.norm(self.spatial.data,
                    p=p_norm,
                    dim=-1,
@@ -183,7 +266,14 @@ class BaseNMF(VideoFactorizer):
                   out=self.temporal.data)
 
     def _temporal_precompute(self, video_wrapper, **kwargs):
-        """ Precompute Sigma, Delta For Use In Temporal Update """
+        """ Precompute Sigma, Delta For Use In Temporal Update
+
+        Parameter:
+            video_wrapper:
+            **kwargs:
+
+        """
+
         # Sigma = C'C
         torch.matmul(self.spatial.data,
                      self.spatial.data.t(),
@@ -200,12 +290,25 @@ class BaseNMF(VideoFactorizer):
         ...
 
     def update_temporal(self, video_wrapper, **kwargs):
-        """ Perform the HALS update of the temporal factor """
+        """ Perform the HALS update of the temporal factor
+
+        Parameter:
+            video_wrapper:
+            **kwargs: optional additional input arguments
+
+        """
+
         self._temporal_precompute(video_wrapper, **kwargs)
         self._temporal_update(**kwargs)
 
     def normalize_temporal(self, p_norm=float('inf')):
-        """ Scale each temporal component to have unit p-norm """
+        """ Scale each temporal component to have unit p-norm
+
+        Parameter:
+            p_norm:
+
+        """
+
         torch.norm(self.temporal.data,
                    p=p_norm,
                    dim=-1,
@@ -225,11 +328,20 @@ class HalsNMF(SpatialHals, TemporalHals, BaseNMF):
 
 class LocalizedNMF(SpatialHals, TemporalHals, BaseNMF):
     """ Adds Region-Localization Factors & Updates To Hals Factorization """
+
     def __init__(self,
                  max_num_components,
                  video_shape,
                  device='cuda'):
-        """ allocate neccesary buffers & copy initialization from host """
+        """ allocate neccesary buffers & copy initialization from host
+
+        Parameter:
+            max_num_components: maximum number of components
+            video_shape: video shape
+            device: computation device
+
+        """
+
         super().__init__(max_num_components, video_shape, device=device)
         self.distance = TensorFactor((self.num_components, video_shape[0]),
                                      scratch=True,
@@ -243,28 +355,53 @@ class LocalizedNMF(SpatialHals, TemporalHals, BaseNMF):
                                     dtype=torch.float32)
 
     def _resize(self, num_components):
-        """ Resize each factor axis inplace to represent N components """
+        """ Resize each factor axis inplace to represent N components
+
+        Parameter:
+            num_components: number of components
+
+        """
+
         super()._resize(num_components)
         self.distance.resize_axis_(0, num_components)
         self.regions.resize_axis_(0, num_components)
         self.lambdas.resize_axis_(0, num_components)
 
     def permute(self, permutation):
-        """ Reorder component in factors according to provided permutation """
+        """ Reorder component in factors according to provided permutation
+
+        Parameter:
+            permutation: permutation order
+
+        """
+
         super().permute(permutation)
         self.distance.permute_(permutation, scratch=True)
         self.regions.permute_(permutation)
         self.lambdas.permute_(permutation)
 
     def _spatial_precompute(self, video_wrapper, **kwargs):
-        """ """
+        """ precompute spatial components
+
+        Parameter:
+            video_wrapper: VideoWrapper class object
+            **kwargs: optional additional input arguments
+
+        """
+
         super()._spatial_precompute(video_wrapper, **kwargs)
         torch.sub(self.spatial.scratch,
                   self.distance.scratch,
                   out=self.spatial.scratch)
 
     def set_from_regions(self, region_factorizations, region_metadata):
-        """ Use Within-Region Factorizations To Init Full FOV Factors """
+        """ Use Within-Region Factorizations To Init Full FOV Factors
+
+        Parameter:
+            region_factorizations:
+            region_metadata: region metadata
+
+        """
         ranks = [len(factorization) for factorization in region_factorizations]
         self.num_components = np.sum(ranks)
         sdx = 0

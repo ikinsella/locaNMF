@@ -21,7 +21,21 @@ def adaptive_fit(video_mats,
                  rank_range=(2, 14, 1),
                  device='cuda',
                  **kwargs):
-    """ Perform LocaNMF Of A Low Rank Video With Automated Param Tuning """
+    """Perform LocaNMF Of A Low Rank Video With Automated Param Tuning
+
+    Parameter:
+        video_mats: brain masked spatial components from denoiser
+        valid_mask: valid brain mask
+        region_map: preprocessed allen Dorsal Map
+        rank_range: rank range
+        device: computation device, default is cuda
+        **kwargs: optional additional input arguments
+
+    Return:
+        nmf_factors: localized NMF components
+
+    """
+
     # Create Region Metadata
     region_mats = extract_region_metadata(valid_mask,
                                           region_map,
@@ -57,7 +71,21 @@ def adaptive_fit(video_mats,
 def extract_region_metadata(valid_mask,
                             region_map,
                             min_size=0):
-    """ Generates Support & Distance Matrices From FOV Mask + Region Map """
+    """Generates Support & Distance Matrices From FOV Mask + Region Map
+
+    Parameter:
+        valid_mask: valid brain mask
+        region_map: preprocessed allen Dorsal Map
+        min_size: minimum number of pixels in Allen map for it
+            to be considered a brain region
+
+    Return:
+        region_metadata: with
+        region_mats[0] = [unique regions x pixels] the mask of each region,
+        region_mats[1] = [unique regions x pixels] the distance penalty of each region,
+        and region_mats[2] = [unique regions] area code
+
+    """
     # Get All (Potentially Signed) Labels From Map
     region_labels = np.unique(region_map[valid_mask])
     region_labels = region_labels[region_labels != 0]
@@ -88,7 +116,19 @@ def factor_region_videos(video_mats,
                          region_masks,
                          max_rank,
                          device='cuda'):
-    """ Perform within-region SVD for use in full-fov initialization """
+    """Perform within-region SVD for use in full-fov initialization
+
+    Parameter:
+        video_mats: brain masked spatial components from denoiser
+        region_masks: brain mask of each region
+        max_rank: maximum number of components per brain region
+        device: computation device
+
+    Return:
+        region_low_rank_videos: low rank videos in each region
+
+
+    """
     # Allocate Space For Within-Region Low Rank Videos On Device
     region_low_rank_videos = [
         LowRankVideo((int(np.sum(mask)), max_rank, video_mats[1].shape[-1]),
@@ -132,7 +172,24 @@ def rank_linesearch(low_rank_video,
                     indent='',
                     device='cuda',
                     **kwargs):
-    """Increment Per-Region Rank Until Local R^2 Fits Are Sufficiently High"""
+    """Increment Per-Region Rank Until Local R^2 Fits Are Sufficiently High
+
+    Parameter:
+        low_rank_video: LowRankVideo class object
+        region_metadata: RegionMetadata class object
+        region_lr_videos: low rank videos in each region
+        rank_range: rank range
+        maxiter_rank: maximum iteration rank
+        verbose: whether or not print status update
+        indent: previous identation for printing status update
+        device: computation device
+        **kwargs: additional optional input arguments
+
+    Return:
+        nmf_factors: localized NMF components
+
+    """
+
     # Parse Args
     if isinstance(verbose, bool):
         verbose = [verbose] * 3
@@ -230,7 +287,18 @@ def init_from_low_rank_video(low_rank_video,
                              indent='',
                              device='cuda',
                              **kwargs):
-    """ Initialize Region Using NMF On Low Rank Approx """
+    """Initialize Region Using NMF On Low Rank Approx
+
+    Parameter:
+        low_rank_video: LowRankVideo class object
+        factorization: localized NMF components
+        num_components: number of components
+        verbose: whether or not print status update
+        indent: previous identation for printing status update
+        device: computation device
+        **kwargs: additional optional input arguments
+
+    """
     factorization.num_components = num_components
     factorization.spatial.data.fill_(1.0)
     factorization.temporal.data.copy_(
@@ -254,7 +322,23 @@ def evaluate_fit_to_region(low_rank_video,
                            sample_prop=(1, 1),
                            device='cuda',
                            **kwargs):
-    """ Compute Coef Of Determination Of Current Fit """
+    """Compute Coef Of Determination Of Current Fit
+
+    Parameter:
+        low_rank_video: low rank factored video
+        video_factorization: localized NMF components
+        region_mask: region masks
+        r2_thresh: minimum r squared for a fit to be considered to be good
+        sample_prop: proportion of pixels and frames used to compute r squared
+        device: computation device
+        **kwargs: optional additional input arguments
+
+    Return:
+        r2_est < r2_thresh: whether r2 estimated is lower that r2_thresh
+        r2_est: r2 estimated
+
+    """
+
     region_idx = torch.nonzero(region_mask).squeeze()
     if sample_prop[0] < 1.0:
         perm = torch.randperm(region_idx.size(0), device=device)
@@ -312,7 +396,27 @@ def lambda_linesearch(video,
                       indent='',
                       device='cuda',
                       **kwargs):
-    """Tune Lambdas Until Components Are Sufficiently Region-Localized"""
+    """Tune Lambdas Until Components Are Sufficiently Region-Localized
+
+    Parameter:
+        video: LowRankVideo class object
+        region_metadata: RegionMetadata class object
+        localized_factorization: localized NMF factors
+        lambda_init: initial lambda value for lambda search
+        lambda_step: step size for tuning lambda parameter
+        loc_thresh: minimum localization required for a component
+        maxiter_lambda: maximum number of iteration for tuning lambda parameter
+        verbose: whether or not print status update
+        indent: previous identation for printing status update
+        device: computation device
+        **kwargs: optional additional input arguments
+
+    Return:
+
+
+    """
+
+
     # Parse Args
     if isinstance(verbose, bool):
         verbose = [verbose] * 2
@@ -398,7 +502,21 @@ def hals(video,
          indent='',
          device='cuda',
          **kwargs):
-    """ Perform maxiter HALS updates To Temporal & Spatial Components """
+    """Perform maxiter HALS updates To Temporal & Spatial Components
+
+    Parameter:
+        video: LowRankVideo class object
+        video_factorization: localized NMF factors
+        maxiter_hals: maximum number of iterations to tune hals
+        verbose: whether or not print status update
+        indent: previous identation for printing status update
+        device: computation device
+        **kwargs: optional additional input arguments
+
+    Return:
+        hals iteration counter
+
+    """
     for itr in range(maxiter_hals):
         if verbose:
             if device=='cuda': torch.cuda.synchronize()
@@ -431,6 +549,9 @@ def hals(video,
     return itr + 1
 
 def version():
+    """ Get version of LocaNMF
+
+    """
     print('version = 1.0')
 
 
