@@ -67,6 +67,8 @@ jupyter-lab &
 to start jupyter-lab server. In the pop-out web browser, double-click the notebook to open it.
 The code is editable and can be run cell by cell by pressing "shift + enter".
 
+LocaNMF [documentation](http://htmlpreview.github.io/?https://github.com/ikinsella/locaNMF/blob/master/doc/locanmf.html) 
+is also available.
 
 
 
