@@ -412,7 +412,7 @@ def lambda_linesearch(video,
         **kwargs: optional additional input arguments
 
     Return:
-
+        hals iteration counter
 
     """
 
