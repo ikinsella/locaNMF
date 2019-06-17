@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module locanmf.LocaNMF</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="locanmf.html"><font color="#ffffff">locanmf</font></a>.LocaNMF</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/jian/anaconda3/envs/locanmf/lib/python3.6/site-packages/locanmf-1.0-py3.6.egg/locanmf/LocaNMF.py">/home/jian/anaconda3/envs/locanmf/lib/python3.6/site-packages/locanmf-1.0-py3.6.egg/locanmf/LocaNMF.py</a></font></td></tr></table>
+    <p><tt>Module&nbsp;Docstring</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top><a href="scipy.spatial.html">scipy.spatial</a><br>
+</td><td width="25%" valign=top><a href="torch.html">torch</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-adaptive_fit"><strong>adaptive_fit</strong></a>(video_mats, valid_mask, region_map, rank_range=(2, 14, 1), device='cuda', **kwargs)</dt><dd><tt>Perform&nbsp;LocaNMF&nbsp;Of&nbsp;A&nbsp;Low&nbsp;Rank&nbsp;Video&nbsp;With&nbsp;Automated&nbsp;Param&nbsp;Tuning<br>
+&nbsp;<br>
+Parameter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;video_mats:&nbsp;brain&nbsp;masked&nbsp;spatial&nbsp;components&nbsp;from&nbsp;denoiser<br>
+&nbsp;&nbsp;&nbsp;&nbsp;valid_mask:&nbsp;valid&nbsp;brain&nbsp;mask<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_map:&nbsp;preprocessed&nbsp;allen&nbsp;Dorsal&nbsp;Map<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rank_range:&nbsp;rank&nbsp;range<br>
+&nbsp;&nbsp;&nbsp;&nbsp;device:&nbsp;computation&nbsp;device,&nbsp;default&nbsp;is&nbsp;cuda<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**kwargs:&nbsp;optional&nbsp;additional&nbsp;input&nbsp;arguments<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;nmf_factors:&nbsp;localized&nbsp;NMF&nbsp;components</tt></dd></dl>
+ <dl><dt><a name="-evaluate_fit_to_region"><strong>evaluate_fit_to_region</strong></a>(low_rank_video, video_factorization, region_mask, r2_thresh=0.98, sample_prop=(1, 1), device='cuda', **kwargs)</dt><dd><tt>Compute&nbsp;Coef&nbsp;Of&nbsp;Determination&nbsp;Of&nbsp;Current&nbsp;Fit<br>
+&nbsp;<br>
+Parameter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;low_rank_video:&nbsp;low&nbsp;rank&nbsp;factored&nbsp;video<br>
+&nbsp;&nbsp;&nbsp;&nbsp;video_factorization:&nbsp;localized&nbsp;NMF&nbsp;components<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_mask:&nbsp;region&nbsp;masks<br>
+&nbsp;&nbsp;&nbsp;&nbsp;r2_thresh:&nbsp;minimum&nbsp;r&nbsp;squared&nbsp;for&nbsp;a&nbsp;fit&nbsp;to&nbsp;be&nbsp;considered&nbsp;to&nbsp;be&nbsp;good<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sample_prop:&nbsp;proportion&nbsp;of&nbsp;pixels&nbsp;and&nbsp;frames&nbsp;used&nbsp;to&nbsp;compute&nbsp;r&nbsp;squared<br>
+&nbsp;&nbsp;&nbsp;&nbsp;device:&nbsp;computation&nbsp;device<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**kwargs:&nbsp;optional&nbsp;additional&nbsp;input&nbsp;arguments<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;r2_est&nbsp;&lt;&nbsp;r2_thresh:&nbsp;whether&nbsp;r2&nbsp;estimated&nbsp;is&nbsp;lower&nbsp;that&nbsp;r2_thresh<br>
+&nbsp;&nbsp;&nbsp;&nbsp;r2_est:&nbsp;r2&nbsp;estimated</tt></dd></dl>
+ <dl><dt><a name="-extract_region_metadata"><strong>extract_region_metadata</strong></a>(valid_mask, region_map, min_size=0)</dt><dd><tt>Generates&nbsp;Support&nbsp;&amp;&nbsp;Distance&nbsp;Matrices&nbsp;From&nbsp;FOV&nbsp;Mask&nbsp;+&nbsp;Region&nbsp;Map<br>
+&nbsp;<br>
+Parameter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;valid_mask:&nbsp;valid&nbsp;brain&nbsp;mask<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_map:&nbsp;preprocessed&nbsp;allen&nbsp;Dorsal&nbsp;Map<br>
+&nbsp;&nbsp;&nbsp;&nbsp;min_size:&nbsp;minimum&nbsp;number&nbsp;of&nbsp;pixels&nbsp;in&nbsp;Allen&nbsp;map&nbsp;for&nbsp;it<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;be&nbsp;considered&nbsp;a&nbsp;brain&nbsp;region<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_metadata:&nbsp;with<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_mats[0]&nbsp;=&nbsp;[unique&nbsp;regions&nbsp;x&nbsp;pixels]&nbsp;the&nbsp;mask&nbsp;of&nbsp;each&nbsp;region,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_mats[1]&nbsp;=&nbsp;[unique&nbsp;regions&nbsp;x&nbsp;pixels]&nbsp;the&nbsp;distance&nbsp;penalty&nbsp;of&nbsp;each&nbsp;region,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;region_mats[2]&nbsp;=&nbsp;[unique&nbsp;regions]&nbsp;area&nbsp;code</tt></dd></dl>
+ <dl><dt><a name="-factor_region_videos"><strong>factor_region_videos</strong></a>(video_mats, region_masks, max_rank, device='cuda')</dt><dd><tt>Perform&nbsp;within-region&nbsp;SVD&nbsp;for&nbsp;use&nbsp;in&nbsp;full-fov&nbsp;initialization<br>
+&nbsp;<br>
+Parameter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;video_mats:&nbsp;brain&nbsp;masked&nbsp;spatial&nbsp;components&nbsp;from&nbsp;denoiser<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_masks:&nbsp;brain&nbsp;mask&nbsp;of&nbsp;each&nbsp;region<br>
+&nbsp;&nbsp;&nbsp;&nbsp;max_rank:&nbsp;maximum&nbsp;number&nbsp;of&nbsp;components&nbsp;per&nbsp;brain&nbsp;region<br>
+&nbsp;&nbsp;&nbsp;&nbsp;device:&nbsp;computation&nbsp;device<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_low_rank_videos:&nbsp;low&nbsp;rank&nbsp;videos&nbsp;in&nbsp;each&nbsp;region</tt></dd></dl>
+ <dl><dt><a name="-hals"><strong>hals</strong></a>(video, video_factorization, maxiter_hals=30, verbose=False, indent='', device='cuda', **kwargs)</dt><dd><tt>Perform&nbsp;maxiter&nbsp;HALS&nbsp;updates&nbsp;To&nbsp;Temporal&nbsp;&amp;&nbsp;Spatial&nbsp;Components<br>
+&nbsp;<br>
+Parameter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;video:&nbsp;LowRankVideo&nbsp;class&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;video_factorization:&nbsp;localized&nbsp;NMF&nbsp;factors<br>
+&nbsp;&nbsp;&nbsp;&nbsp;maxiter_hals:&nbsp;maximum&nbsp;number&nbsp;of&nbsp;iterations&nbsp;to&nbsp;tune&nbsp;hals<br>
+&nbsp;&nbsp;&nbsp;&nbsp;verbose:&nbsp;whether&nbsp;or&nbsp;not&nbsp;print&nbsp;status&nbsp;update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indent:&nbsp;previous&nbsp;identation&nbsp;for&nbsp;printing&nbsp;status&nbsp;update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;device:&nbsp;computation&nbsp;device<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**kwargs:&nbsp;optional&nbsp;additional&nbsp;input&nbsp;arguments<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;hals&nbsp;iteration&nbsp;counter</tt></dd></dl>
+ <dl><dt><a name="-init_from_low_rank_video"><strong>init_from_low_rank_video</strong></a>(low_rank_video, factorization, num_components, verbose=False, indent='', device='cuda', **kwargs)</dt><dd><tt>Initialize&nbsp;Region&nbsp;Using&nbsp;NMF&nbsp;On&nbsp;Low&nbsp;Rank&nbsp;Approx<br>
+&nbsp;<br>
+Parameter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;low_rank_video:&nbsp;LowRankVideo&nbsp;class&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;factorization:&nbsp;localized&nbsp;NMF&nbsp;components<br>
+&nbsp;&nbsp;&nbsp;&nbsp;num_components:&nbsp;number&nbsp;of&nbsp;components<br>
+&nbsp;&nbsp;&nbsp;&nbsp;verbose:&nbsp;whether&nbsp;or&nbsp;not&nbsp;print&nbsp;status&nbsp;update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indent:&nbsp;previous&nbsp;identation&nbsp;for&nbsp;printing&nbsp;status&nbsp;update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;device:&nbsp;computation&nbsp;device<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**kwargs:&nbsp;additional&nbsp;optional&nbsp;input&nbsp;arguments</tt></dd></dl>
+ <dl><dt><a name="-lambda_linesearch"><strong>lambda_linesearch</strong></a>(video, region_metadata, localized_factorization, lambda_init=0.005, lambda_step=1.5, loc_thresh=20, maxiter_lambda=15, verbose=False, indent='', device='cuda', **kwargs)</dt><dd><tt>Tune&nbsp;Lambdas&nbsp;Until&nbsp;Components&nbsp;Are&nbsp;Sufficiently&nbsp;Region-Localized<br>
+&nbsp;<br>
+Parameter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;video:&nbsp;LowRankVideo&nbsp;class&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_metadata:&nbsp;RegionMetadata&nbsp;class&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;localized_factorization:&nbsp;localized&nbsp;NMF&nbsp;factors<br>
+&nbsp;&nbsp;&nbsp;&nbsp;lambda_init:&nbsp;initial&nbsp;lambda&nbsp;value&nbsp;for&nbsp;lambda&nbsp;search<br>
+&nbsp;&nbsp;&nbsp;&nbsp;lambda_step:&nbsp;step&nbsp;size&nbsp;for&nbsp;tuning&nbsp;lambda&nbsp;parameter<br>
+&nbsp;&nbsp;&nbsp;&nbsp;loc_thresh:&nbsp;minimum&nbsp;localization&nbsp;required&nbsp;for&nbsp;a&nbsp;component<br>
+&nbsp;&nbsp;&nbsp;&nbsp;maxiter_lambda:&nbsp;maximum&nbsp;number&nbsp;of&nbsp;iteration&nbsp;for&nbsp;tuning&nbsp;lambda&nbsp;parameter<br>
+&nbsp;&nbsp;&nbsp;&nbsp;verbose:&nbsp;whether&nbsp;or&nbsp;not&nbsp;print&nbsp;status&nbsp;update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indent:&nbsp;previous&nbsp;identation&nbsp;for&nbsp;printing&nbsp;status&nbsp;update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;device:&nbsp;computation&nbsp;device<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**kwargs:&nbsp;optional&nbsp;additional&nbsp;input&nbsp;arguments<br>
+&nbsp;<br>
+Return:</tt></dd></dl>
+ <dl><dt><a name="-rank_linesearch"><strong>rank_linesearch</strong></a>(low_rank_video, region_metadata, region_lr_videos, rank_range=(2, 14, 1), maxiter_rank=20, verbose=[False, False, False], indent='', device='cuda', **kwargs)</dt><dd><tt>Increment&nbsp;Per-Region&nbsp;Rank&nbsp;Until&nbsp;Local&nbsp;R^2&nbsp;Fits&nbsp;Are&nbsp;Sufficiently&nbsp;High<br>
+&nbsp;<br>
+Parameter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;low_rank_video:&nbsp;LowRankVideo&nbsp;class&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_metadata:&nbsp;RegionMetadata&nbsp;class&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;region_lr_videos:&nbsp;low&nbsp;rank&nbsp;videos&nbsp;in&nbsp;each&nbsp;region<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rank_range:&nbsp;rank&nbsp;range<br>
+&nbsp;&nbsp;&nbsp;&nbsp;maxiter_rank:&nbsp;maximum&nbsp;iteration&nbsp;rank<br>
+&nbsp;&nbsp;&nbsp;&nbsp;verbose:&nbsp;whether&nbsp;or&nbsp;not&nbsp;print&nbsp;status&nbsp;update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;indent:&nbsp;previous&nbsp;identation&nbsp;for&nbsp;printing&nbsp;status&nbsp;update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;device:&nbsp;computation&nbsp;device<br>
+&nbsp;&nbsp;&nbsp;&nbsp;**kwargs:&nbsp;additional&nbsp;optional&nbsp;input&nbsp;arguments<br>
+&nbsp;<br>
+Return:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;nmf_factors:&nbsp;localized&nbsp;NMF&nbsp;components</tt></dd></dl>
+ <dl><dt><a name="-time"><strong>time</strong></a>(...)</dt><dd><tt><a href="#-time">time</a>()&nbsp;-&gt;&nbsp;floating&nbsp;point&nbsp;number<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;current&nbsp;time&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;Epoch.<br>
+Fractions&nbsp;of&nbsp;a&nbsp;second&nbsp;may&nbsp;be&nbsp;present&nbsp;if&nbsp;the&nbsp;system&nbsp;clock&nbsp;provides&nbsp;them.</tt></dd></dl>
+ <dl><dt><a name="-version"><strong>version</strong></a>()</dt><dd><tt>Get&nbsp;version&nbsp;of&nbsp;LocaNMF</tt></dd></dl>
+</td></tr></table>
+</body></html>
