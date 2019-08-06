@@ -1,6 +1,6 @@
 
 from typing import List
-
+import copy
 
 import numpy as np
 # from scipy import signal
@@ -105,7 +105,7 @@ def init_w(d1, d2, r):
     :param d1: x axis frame size
     :param d2: y axis frame size
     :param r: ring radius of ring model
-    :return:
+    :return: W weighting matrix of shape [d1, d2]
     """
 
     # Compute XY distance tile
@@ -129,14 +129,18 @@ def init_w(d1, d2, r):
     W = lil_matrix((d, d), dtype=np.float)
     for i in range(d1):
         for j in range(d2):
-            d1_d2_2r = np.zeros((d1 + 2 * r + 3, d2 + 2 * r + 3), dtype=float)
             ij = i * d2 + j
-            x_base = i + r
-            y_base = j + r
-            d1_d2_2r[ring_idx_T[0, :] + x_base, ring_idx_T[1, :] + y_base] = 1
-            d3_sub = d1_d2_2r[r:(r + d1), r:(r + d2)].reshape(1, -1)
-            d3_sub_idx = np.argwhere(d3_sub)
-            W[ij, d3_sub_idx[:, 1]] = 1.0
+            x_base, y_base = i + r, j + r
+            ring_idx_T2 = copy.deepcopy(ring_idx_T)
+            ring_idx_T2[0, :] += x_base
+            ring_idx_T2[1, :] += y_base
+            selection_0 = np.logical_and(ring_idx_T2[0, :] >= r, ring_idx_T2[0, :] < r + d1)
+            selection_1 = np.logical_and(ring_idx_T2[1, :] >= r, ring_idx_T2[1, :] < r + d2)
+            selection = np.logical_and(selection_0, selection_1)
+            selection_idx = np.argwhere(selection)
+            ring_idx_T3 = ring_idx_T2[:, selection_idx[:, 0]]
+            ring_idx = (ring_idx_T3[0, :] - r) * d2 + ring_idx_T3[1, :] - r
+            W[ij, ring_idx] = 1.0
     return W
 
 
