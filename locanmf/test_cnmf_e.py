@@ -47,4 +47,5 @@ def test_update_ring_model_w():
 
 
 if __name__ == "__main__":
-    test_update_ring_model_w()
+    # test_update_ring_model_w()
+    test_init_w()

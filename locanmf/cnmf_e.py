@@ -3,9 +3,11 @@ from typing import List
 
 
 import numpy as np
-from scipy import signal
+# from scipy import signal
+
 from scipy import ndimage
-import scipy.io as sio
+from scipy.sparse import lil_matrix
+# import scipy.io as sio
 
 
 
@@ -91,9 +93,9 @@ def update_ring_model_w(U, V, A, X, W, d1, d2, T, r):
     if not W:
         W = init_w(d1, d2, r)
 
-    dU = U - np.matmul(A, X)
-    b0 = np.matmul(dU, np.mean(V, axis=1)/T)
-    W = update_w_1p(dU, W)
+    Y = U - np.matmul(A, X)
+    b0 = np.matmul(Y, np.mean(V, axis=1) / T)
+    update_w_1p(Y, W, d1, d2)
     return b0, W
 
 
@@ -118,44 +120,44 @@ def init_w(d1, d2, r):
                           np.less(xy_tile, r1_tile))
     ring_idx = np.argwhere(ring)
     ring_idx_T = np.transpose(ring_idx)
-    ring_idx_T = ring_idx_T - (r + 1) # shift index so that center has zero index
+    ring_idx_T = ring_idx_T - (r + 1)  # shift index so that center has zero index
 
     # Create a weighting matrix to store initial value, the matrix size is padded
     # r cells along 2nd and 3rd dimensions to avoid out of index
-    d_d1_d2_2r = np.zeros((d1 * d2, d1 + 2 * r + 3, d2 + 2 * r + 3))
+
+    d = d1 * d2
+    W = lil_matrix((d, d), dtype=np.float)
     for i in range(d1):
         for j in range(d2):
+            d1_d2_2r = np.zeros((d1 + 2 * r + 3, d2 + 2 * r + 3), dtype=float)
             ij = i * d2 + j
             x_base = i + r
             y_base = j + r
-            d_d1_d2_2r[ij, ring_idx_T[0, :] + x_base, ring_idx_T[1, :] + y_base] = 1
-
-    # Grep the central part and reshape
-    d3_sub = d_d1_d2_2r[:, r:(r + d1), r:(r + d2)]
-    W = np.reshape(d3_sub, (d1*d2, -1))
+            d1_d2_2r[ring_idx_T[0, :] + x_base, ring_idx_T[1, :] + y_base] = 1
+            d3_sub = d1_d2_2r[r:(r + d1), r:(r + d2)].reshape(1, -1)
+            d3_sub_idx = np.argwhere(d3_sub)
+            W[ij, d3_sub_idx[:, 1]] = 1.0
     return W
 
 
-def update_w_1p(dU, W, d1, d2):
+def update_w_1p(Y, W, d1, d2):
     """Update weighting matrix W in place
 
-    :param dU: 2D matrix that is equal to U - AX
+    :param Y: 2D matrix that is equal to U - AX
     :param W: weighting matrix
     :param d1: x axis frame size
     :param d2: y axis frame size
-    :return: None,
+    :return: None, update W in place
     """
 
     d = d1 * d2
     for i in range(d):
-        dU = dU[i, :]
-        omega = W[i, :] > 0  #use greater than 0, instead of not-equal to 0
-        X = dU[omega, :] # omega is row index vector, check whether this OK
+        y = Y[i, :]
+        omega = np.argwhere(W[i, :] > 0)[:, 1]  # use greater than 0, instead of not-equal to 0
+        X = Y[omega, :]
         A = np.matmul(X, np.transpose(X))
-        b = np.matmul(X, np.transpose(dU))
+        b = np.matmul(X, np.transpose(y))
         W[i, omega] = np.linalg.solve(A, b)
-
-
 
 
 
