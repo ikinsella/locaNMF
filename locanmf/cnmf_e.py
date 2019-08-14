@@ -3,11 +3,9 @@ from typing import List
 import copy
 
 import numpy as np
-# from scipy import signal
-
 from scipy import ndimage
 from scipy.sparse import lil_matrix
-# import scipy.io as sio
+import cv2 as cv
 
 
 
@@ -163,6 +161,86 @@ def update_w_1p(Y, W, d1, d2):
         b = np.matmul(X, np.transpose(y))
         W[i, omega] = np.linalg.solve(A, b)
 
+
+def update_temporal(U, V, A, X, W, d1, d2, T, iter=5):
+    """
+    :param U: spatial component matrix from denoiser, R(d=d1xd2, N)
+    :param V: temporal component matrix from denoiser, R(N, T)
+    :param A: spatial component matrix, R(d, K)
+    :param X: temporal component matrix (the actual temporal matrix C = XV),  R(K, N)
+    :param W: weighting matrix, R(d, d)
+    :param d1: x axis frame size
+    :param d2: y axis frame size
+    :param T: number to time steps along time axis
+    :param iter: number of iterations to update temporal components
+    :return:
+        constant baseline of background image in place
+    """
+
+    U_tilde = U - np.matmul(W, U - np.matmul(A, X))
+    P = np.matmul(np.transpose(A), U_tilde)
+    Q = np.matmul(np.transpose(A), A)
+
+    _, k = A.shape
+    for i in range(iter):
+        for j in range(k):
+            x_j = X[j, :]
+            x_j += (P[j, :] - np.matmul(Q[j, :], X)) / Q[j, j]
+            c_j = np.matmul(x_j, V)
+            # c_j = denoise_fcn(c_j) # denoise_fcn to be incorporated
+            A_part = np.matmul(V, np.transpose(V))
+            b_part = np.matmul(V, np.transpose(c_j))
+            X[j, :] = np.transpose(np.linalg.solve(A_part, b_part))
+    b0 = np.matmul(U, np.mean(V, axis=1)/T) - np.matmul(A, np.mean(X, axis=1)/T)
+    return b0
+
+
+def dilate_A(A, d1, d2, pixels=3):
+    """Dilate spatial component matrix A
+
+    :param A: spatial component matrix, R(d, K)
+    :param pixels: dilation kernel size, default 3 pixels
+    :return: dilated spatial component index matrix
+    """
+
+    M = np.zeros_like(A.shape)
+    _, k = A.shape
+    kernel = np.ones((pixels, pixels), np.uint8)
+    for j in range(k):
+        a_j = A[:, j].reshape(d1, d2)
+        M[:, j] = cv.dilate(a_j > 0.0, kernel, iteration=1)
+
+    return M
+
+
+def update_spatial(U, V, A, X, W, d1, d2, T, iter=5):
+    """
+    param U: spatial component matrix from denoiser, R(d=d1xd2, N)
+    :param V: temporal component matrix from denoiser, R(N, T)
+    :param A: spatial component matrix, R(d, K)
+    :param X: temporal component matrix (the actual temporal matrix C = XV),  R(K, N)
+    :param W: weighting matrix, R(d, d)
+    :param d1: x axis frame size
+    :param d2: y axis frame size
+    :param T: number to time steps along time axis
+    :param iter: number of iterations to update temporal components
+    :return:
+        constant baseline of background image in place
+    """
+
+    U_tilde = U - np.matmul(W, U - np.matmul(A, X))
+    M = dilate_A(A, 3)
+    P = np.matmul(U_tilde, np.transpose(X))
+    Q = np.matmul(X, np.transpose(X))
+
+    _, k = A.shape
+    for i in range(iter):
+        for j in range(k):
+            b_part = A[:, j] + (P[:, j] - np.matmul(A, Q[:, j])) / Q[j, j]
+            A[:, j] = np.multiply(M[:, j], np.maximum(0.0, b_part))
+
+    b0 = np.matmul(U, np.mean(V, axis=1)/T) - np.matmul(A, np.mean(X, axis=1)/T)
+    return b0
 
 
 

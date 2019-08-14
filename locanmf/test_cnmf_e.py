@@ -35,13 +35,19 @@ def test_update_ring_model_w():
     A = data['arr_2']
     X = data['arr_3']
     print(U.shape, V.shape, A.shape, X.shape)
-
-
     b0, W = update_ring_model_w(U, V, A, X, [], d1, d2, T, r)
     print(b0.shape, W.shape)
+    np.savez('b_w.npz',  b0=b0, W=W)
+
+    # # verify output
+    # t0 = U - np.matmul(A, X)
+    # t1 = np.matmul(t0, V)
+    # t2 = np.matmul(W, t1)
+    # t3 = np.matmul(W, np.mean(b0, axis=1)/T)
+    # t4 = np.mean(b0, axis=1)/T
+    # mov = np.matmul(U,V) - (t2 - t3 + t4)
 
 
-    pass
 
 
 
