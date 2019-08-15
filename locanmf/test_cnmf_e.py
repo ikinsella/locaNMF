@@ -1,10 +1,11 @@
 
 import numpy as np
-from scipy import signal
-from scipy import ndimage
+# from scipy import signal
+# from scipy import ndimage
 import scipy.io as sio
 
-from .cnmf_e import spatial_filtering, init_w, update_ring_model_w
+from locanmf.cnmf_e import spatial_filtering, init_w, update_ring_model_w, \
+    update_temporal, update_spatial
 
 
 def test_spatial_filtering():
@@ -26,7 +27,8 @@ def test_init_w():
 
 
 def test_update_ring_model_w():
-    data = np.load("init_W.npz")
+    # test update_ring_model_w
+    data = np.load("cnmfe_init_output.npz")
     print(data.files)
     d1, d2, T, r = data['arr_4']
     # print(d1, d2, r, T)
@@ -37,21 +39,20 @@ def test_update_ring_model_w():
     print(U.shape, V.shape, A.shape, X.shape)
     b0, W = update_ring_model_w(U, V, A, X, [], d1, d2, T, r)
     print(b0.shape, W.shape)
-    np.savez('b_w.npz',  b0=b0, W=W)
+    np.savez('cnmfe_update_ring_output.npz',
+             U=U, V=V, A=A, X=X, W=W, d1=d1, d2=d2, T=T, b0=b0)
 
-    # # verify output
-    # t0 = U - np.matmul(A, X)
-    # t1 = np.matmul(t0, V)
-    # t2 = np.matmul(W, t1)
-    # t3 = np.matmul(W, np.mean(b0, axis=1)/T)
-    # t4 = np.mean(b0, axis=1)/T
-    # mov = np.matmul(U,V) - (t2 - t3 + t4)
+    # test update_temporal
+    # b0_T = update_temporal(U, V, A, X, W, d1, d2, T, iter=5)
+    # print(b0_T.shape)
 
+    # test update_spatial
+    b0_S = update_spatial(U, V, A, X, W, d1, d2, T, iter=5)
 
 
 
 
 
 if __name__ == "__main__":
-    # test_update_ring_model_w()
-    test_init_w()
+    test_update_ring_model_w()
+    # test_init_w()

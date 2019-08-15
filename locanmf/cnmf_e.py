@@ -177,7 +177,7 @@ def update_temporal(U, V, A, X, W, d1, d2, T, iter=5):
         constant baseline of background image in place
     """
 
-    U_tilde = U - np.matmul(W, U - np.matmul(A, X))
+    U_tilde = U - W.dot(U - np.matmul(A, X))
     P = np.matmul(np.transpose(A), U_tilde)
     Q = np.matmul(np.transpose(A), A)
 
@@ -203,13 +203,14 @@ def dilate_A(A, d1, d2, pixels=3):
     :return: dilated spatial component index matrix
     """
 
-    M = np.zeros_like(A.shape)
+    M = np.zeros_like(A)
     _, k = A.shape
     kernel = np.ones((pixels, pixels), np.uint8)
     for j in range(k):
-        a_j = A[:, j].reshape(d1, d2)
-        M[:, j] = cv.dilate(a_j > 0.0, kernel, iteration=1)
-
+        a_j = (A[:, j].reshape(d1, d2) > 0.0).astype('uint8')
+        a_j_d = cv.dilate(a_j, kernel=kernel, iterations=1)
+        a_j_d = np.reshape(a_j_d, [-1, 1])
+        M[:, j] = a_j_d[:, 0]
     return M
 
 
@@ -228,8 +229,8 @@ def update_spatial(U, V, A, X, W, d1, d2, T, iter=5):
         constant baseline of background image in place
     """
 
-    U_tilde = U - np.matmul(W, U - np.matmul(A, X))
-    M = dilate_A(A, 3)
+    U_tilde = U - W.dot(U - np.matmul(A, X))
+    M = dilate_A(A, d1, d2, 3)
     P = np.matmul(U_tilde, np.transpose(X))
     Q = np.matmul(X, np.transpose(X))
 
