@@ -1,4 +1,3 @@
-
 # from typing import list
 import copy
 import math
@@ -24,7 +23,6 @@ def demix_setting():
 
     # TODO: add more options
 
-
     return options
 
 
@@ -39,7 +37,7 @@ def spatial_filtering(spatial_u, settings):
 
     # Gaussian kernel width (approximating size of one neuron)
     gaussian_kernel_width = settings['gaussian_kernel_width']
-    gaussian_kernel_truncate = 2 # this part is different from matlab, equivalent to 4
+    gaussian_kernel_truncate = 2  # this part is different from matlab, equivalent to 4
 
     if gaussian_kernel_width > 0:
         spatial_u_filtered = np.zeros_like(spatial_u)
@@ -60,7 +58,6 @@ def pnr(spatial_u, setting):
 
     :return: PNR of image data Y
     """
-
 
     pass
 
@@ -92,14 +89,12 @@ def init_background(U, V, W, d1, d2, r, T):
     U_ax, W = init_ring_model(U, d1, d2, r)
 
     P1 = np.reshape(U - W.dot(U - U_ax), (d1, d2, -1))
-    P1 = np.reshape(P1, (d1*d2, -1), order='F') # init_neurons() use F order
+    P1 = np.reshape(P1, (d1 * d2, -1), order='F')  # init_neurons() use F order
     P2 = np.transpose(V)
     P0 = np.reshape(np.matmul(U - W.dot(U - U_ax), V), (d1, d2, T), order='F')
-    A, X = init_neurons(P0, P1, P2)
+    A, X = init_neurons_ding(P0, P1, P2)
     W, b0 = update_ring_model_w(U, V, A, X, W, d1, d2, T, r)
     return A, X, W, b0
-
-
 
 
 def init_ring_model(U, d1, d2, r):
@@ -114,7 +109,7 @@ def init_ring_model(U, d1, d2, r):
 
     W = init_w(d1, d2, r)
     _, N = U.shape
-    Z = np.zeros((d1*d2, N))
+    Z = np.zeros((d1 * d2, N))
     # kernel = skimage.morphology.disk(math.ceil(r/2.0))
     kernel = sk_disk(math.ceil(r / 2.0))
 
@@ -125,10 +120,17 @@ def init_ring_model(U, d1, d2, r):
     update_w_1p(Z, W, d1, d2)
     return U - Z, W
 
+
 # init_neurons
-def init_neurons(Yd, U, V, cut_off_point=[0.9,0.9], length_cut=[10,10], th=[2,1], pass_num=1, residual_cut = [0.6,0.6],
-                    corr_th_fix=0.31, max_allow_neuron_size=0.3, merge_corr_thr=0.6, merge_overlap_thr=0.6, num_plane=1, patch_size=[100,100],
-                    plot_en=False, TF=False, fudge_factor=1, text=True, bg=False, max_iter=35, max_iter_fin=50, update_after=4):
+def init_neurons_ding(Yd, U, V, cut_off_point=[0.95, 0.95], length_cut=[10, 10], th=[2, 1], pass_num=1,
+                      residual_cut=[0.6, 0.6],
+                      # corr_th_fix=0.31, max_allow_neuron_size=0.3, merge_corr_thr=0.6, merge_overlap_thr=0.6,
+                      num_plane=1, patch_size=[100, 100],
+                      # plot_en=False, TF=False, fudge_factor=1, text=True,
+                      bg=False,
+                      # max_iter=35, max_iter_fin=50,
+                      # update_after=4
+                      ):
     """
     -------------------------------------------------
     This function is the entire demixing pipeline for low rank data Yd, which can be decomposed as U*V.
@@ -219,22 +221,23 @@ def init_neurons(Yd, U, V, cut_off_point=[0.9,0.9], length_cut=[10,10], th=[2,1]
     if Yd_min < 0:
         Yd_min_pw = Yd.min(axis=2, keepdims=True);
         Yd -= Yd_min_pw;
-        U = np.hstack((U,Yd_min_pw.reshape(np.prod(dims),1,order="F")));
-        V = np.hstack((V,-np.ones([T,1])));
+        U = np.hstack((U, Yd_min_pw.reshape(np.prod(dims), 1, order="F")));
+        V = np.hstack((V, -np.ones([T, 1])));
 
     superpixel_rlt = [];
     ## cut image into small parts to find pure superpixels ##
 
     patch_height = patch_size[0];
     patch_width = patch_size[1];
-    height_num = int(np.ceil(dims[0]/patch_height));  ########### if need less data to find pure superpixel, change dims[0] here #################
-    width_num = int(np.ceil(dims[1]/(patch_width*num_plane)));
-    num_patch = height_num*width_num;
+    height_num = int(np.ceil(dims[
+                                 0] / patch_height));  ########### if need less data to find pure superpixel, change dims[0] here #################
+    width_num = int(np.ceil(dims[1] / (patch_width * num_plane)));
+    num_patch = height_num * width_num;
     patch_ref_mat = np.array(range(num_patch)).reshape(height_num, width_num, order="F");
 
     ii = 0;
     while ii < pass_num:
-        print("start " + str(ii+1) + " pass!");
+        print("start " + str(ii + 1) + " pass!");
         if ii > 0:
             if bg:
                 Yd_res = superpixel_analysis.reconstruct(Yd, a, c, b, fb, ff);
@@ -250,11 +253,16 @@ def init_neurons(Yd, U, V, cut_off_point=[0.9,0.9], length_cut=[10,10], th=[2,1]
         start = time.time();
         if num_plane > 1:
             print("3d data!");
-            connect_mat_1, idx, comps, permute_col = superpixel_analysis.find_superpixel_3d(Yt,num_plane,cut_off_point[ii],length_cut[ii],eight_neighbours=True);
+            connect_mat_1, idx, comps, permute_col = superpixel_analysis.find_superpixel_3d(Yt, num_plane,
+                                                                                            cut_off_point[ii],
+                                                                                            length_cut[ii],
+                                                                                            eight_neighbours=True);
         else:
             print("find superpixels!")
-            connect_mat_1, idx, comps, permute_col = superpixel_analysis.find_superpixel(Yt,cut_off_point[ii],length_cut[ii],eight_neighbours=True);
-        print("time: " + str(time.time()-start));
+            connect_mat_1, idx, comps, permute_col = superpixel_analysis.find_superpixel(Yt, cut_off_point[ii],
+                                                                                         length_cut[ii],
+                                                                                         eight_neighbours=True);
+        print("time: " + str(time.time() - start));
 
         start = time.time();
         print("rank 1 svd!")
@@ -262,55 +270,54 @@ def init_neurons(Yd, U, V, cut_off_point=[0.9,0.9], length_cut=[10,10], th=[2,1]
             c_ini, a_ini, _, _ = superpixel_analysis.spatial_temporal_ini(Yt, comps, idx, length_cut[ii], bg=False);
         else:
             c_ini, a_ini, ff, fb = superpixel_analysis.spatial_temporal_ini(Yt, comps, idx, length_cut[ii], bg=bg);
-            #return ff
-        print("time: " + str(time.time()-start));
-        unique_pix = np.asarray(np.sort(np.unique(connect_mat_1)),dtype="int");
+            # return ff
+        print("time: " + str(time.time() - start));
+        unique_pix = np.asarray(np.sort(np.unique(connect_mat_1)), dtype="int");
         unique_pix = unique_pix[np.nonzero(unique_pix)];
-        #unique_pix = np.asarray(np.sort(np.unique(connect_mat_1))[1:]); #search_superpixel_in_range(connect_mat_1, permute_col, V_mat);
+        # unique_pix = np.asarray(np.sort(np.unique(connect_mat_1))[1:]); #search_superpixel_in_range(connect_mat_1, permute_col, V_mat);
         brightness_rank_sup = superpixel_analysis.order_superpixels(permute_col, unique_pix, a_ini, c_ini);
 
-        #unique_pix = np.asarray(unique_pix);
+        # unique_pix = np.asarray(unique_pix);
         pure_pix = [];
 
         start = time.time();
         print("find pure superpixels!")
         for kk in range(num_patch):
-            pos = np.where(patch_ref_mat==kk);
-            up=pos[0][0]*patch_height;
-            down=min(up+patch_height, dims[0]);
-            left=pos[1][0]*patch_width;
-            right=min(left+patch_width, dims[1]);
-            unique_pix_temp, M = superpixel_analysis.search_superpixel_in_range((connect_mat_1.reshape(dims[0],int(dims[1]/num_plane),num_plane,order="F"))[up:down,left:right], permute_col, c_ini);
+            pos = np.where(patch_ref_mat == kk);
+            up = pos[0][0] * patch_height;
+            down = min(up + patch_height, dims[0]);
+            left = pos[1][0] * patch_width;
+            right = min(left + patch_width, dims[1]);
+            unique_pix_temp, M = superpixel_analysis.search_superpixel_in_range(
+                (connect_mat_1.reshape(dims[0], int(dims[1] / num_plane), num_plane, order="F"))[up:down, left:right],
+                permute_col, c_ini);
             pure_pix_temp = superpixel_analysis.fast_sep_nmf(M, M.shape[1], residual_cut[ii]);
-            if len(pure_pix_temp)>0:
+            if len(pure_pix_temp) > 0:
                 pure_pix = np.hstack((pure_pix, unique_pix_temp[pure_pix_temp]));
         pure_pix = np.unique(pure_pix);
 
-        print("time: " + str(time.time()-start));
+        print("time: " + str(time.time() - start));
 
         start = time.time();
         print("prepare iteration!")
         if ii > 0:
-            a_ini, c_ini, brightness_rank = superpixel_analysis.prepare_iteration(Yd_res, connect_mat_1, permute_col, pure_pix, a_ini, c_ini);
+            a_ini, c_ini, brightness_rank = superpixel_analysis.prepare_iteration(Yd_res, connect_mat_1, permute_col,
+                                                                                  pure_pix, a_ini, c_ini);
             a = np.hstack((a, a_ini));
             c = np.hstack((c, c_ini));
         else:
-            a, c, b, normalize_factor, brightness_rank = superpixel_analysis.prepare_iteration(Yd, connect_mat_1, permute_col, pure_pix, a_ini, c_ini, more=True);
-        print("time: " + str(time.time()-start));
+            a, c, b, normalize_factor, brightness_rank = superpixel_analysis.prepare_iteration(Yd, connect_mat_1,
+                                                                                               permute_col, pure_pix,
+                                                                                               a_ini, c_ini, more=True);
+        print("time: " + str(time.time() - start));
 
         # The above codes are copied from Ding's funimag/superpixel_analysis.py
-        # C_centered = c - c.mean(axis=1).reshape(-1, 1)
-        # VV = V @ V.transpose()
-        # X = np.linalg.solve(VV, V @ C_centered.transpose()).transpose()
-        # return a, X
-
         c = np.transpose(c)
         if Yd_min < 0:
             V = V[:, :-1]
         V = np.transpose(V)
         X = np.linalg.solve(np.matmul(V, np.transpose(V)), np.matmul(V, np.transpose(c))).transpose()
         return a, X
-
 
 
 def update_ring_model_w(U, V, A, X, W, d1, d2, T, r):
@@ -433,7 +440,7 @@ def update_temporal(U, V, A, X, W, d1, d2, T, iter=5):
             A_part = np.matmul(V, np.transpose(V))
             b_part = np.matmul(V, np.transpose(c_j))
             X[j, :] = np.transpose(np.linalg.solve(A_part, b_part))
-    b0 = np.matmul(U, np.mean(V, axis=1)/T) - np.matmul(A, np.mean(X, axis=1)/T)
+    b0 = np.matmul(U, np.mean(V, axis=1) / T) - np.matmul(A, np.mean(X, axis=1) / T)
     return b0
 
 
@@ -482,36 +489,5 @@ def update_spatial(U, V, A, X, W, d1, d2, T, iter=5):
             b_part = A[:, j] + (P[:, j] - np.matmul(A, Q[:, j])) / Q[j, j]
             A[:, j] = np.multiply(M[:, j], np.maximum(0.0, b_part))
 
-    b0 = np.matmul(U, np.mean(V, axis=1)/T) - np.matmul(A, np.mean(X, axis=1)/T)
+    b0 = np.matmul(U, np.mean(V, axis=1) / T) - np.matmul(A, np.mean(X, axis=1) / T)
     return b0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
