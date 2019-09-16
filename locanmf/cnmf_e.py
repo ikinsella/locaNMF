@@ -91,8 +91,9 @@ def init_background(U, V, W, d1, d2, r, T):
     P1 = np.reshape(U - W.dot(U - U_ax), (d1, d2, -1))
     P1 = np.reshape(P1, (d1 * d2, -1), order='F')  # init_neurons() use F order
     P2 = np.transpose(V)
-    P0 = np.reshape(np.matmul(U - W.dot(U - U_ax), V), (d1, d2, T), order='F')
-    A, X = init_neurons_ding(P0, P1, P2)
+    P0 = np.reshape(np.matmul(U - W.dot(U - U_ax), V), (d1, d2, T), order='C')
+    A, X, _ = init_neurons_ding(P0, P1, P2, d1, d2)
+    
     W, b0 = update_ring_model_w(U, V, A, X, W, d1, d2, T, r)
     return A, X, W, b0
 
@@ -122,7 +123,7 @@ def init_ring_model(U, d1, d2, r):
 
 
 # init_neurons
-def init_neurons_ding(Yd, U, V, cut_off_point=[0.95, 0.95], length_cut=[10, 10], th=[2, 1], pass_num=1,
+def init_neurons_ding(Yd, U, V, d1, d2, cut_off_point=[0.95, 0.95], length_cut=[10, 10], th=[2, 1], pass_num=1,
                       residual_cut=[0.6, 0.6],
                       # corr_th_fix=0.31, max_allow_neuron_size=0.3, merge_corr_thr=0.6, merge_overlap_thr=0.6,
                       num_plane=1, patch_size=[100, 100],
@@ -311,13 +312,19 @@ def init_neurons_ding(Yd, U, V, cut_off_point=[0.95, 0.95], length_cut=[10, 10],
                                                                                                a_ini, c_ini, more=True);
         print("time: " + str(time.time() - start));
 
-        # The above codes are copied from Ding's funimag/superpixel_analysis.py
-        c = np.transpose(c)
+        # The above codes are copied exactly from Ding's funimag/superpixel_analysis.py
+
+        # Split C into X * V
         if Yd_min < 0:
             V = V[:, :-1]
         V = np.transpose(V)
-        X = np.linalg.solve(np.matmul(V, np.transpose(V)), np.matmul(V, np.transpose(c))).transpose()
-        return a, X
+        X = np.linalg.solve(np.matmul(V, np.transpose(V)), np.matmul(V, c)).transpose()
+
+        # a is in Fortran major(memory) order, reshape it to C major order
+        A = np.reshape(a, (d1, d2, -1), order='F')
+        A = np.reshape(A, (d1 * d2, -1))
+        C = np.transpose(c)
+        return A, X, C
 
 
 def update_ring_model_w(U, V, A, X, W, d1, d2, T, r):
