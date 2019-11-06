@@ -1,10 +1,10 @@
 # LocaNMF
 
-LocaNMF toolkit (Localized semi-Nonnegative Matrix Factorization) can eﬃciently decompose wideﬁeld video 
+LocaNMF (Localized semi-Nonnegative Matrix Factorization) can eﬃciently decompose wideﬁeld video 
 data and allows user to directly compare activity across multiple mice by outputting mouse-speciﬁc 
 localized functional regions. LocaNMF uses a fast low-rank version of Hierarchical Alternating Least 
 Squares (HALS), and outputs components that are signiﬁcantly more interpretable than traditional NMF
-or SVD-based techniques.
+or SVD-based techniques. Read more about this method and the results it provides in our bioRxiv [here](https://www.biorxiv.org/content/10.1101/650093v1)!
  
 It is built on top of PyTorch, written in Python and C++, and is capable to run on either CPU or
 Nvidia CUDA-enabled GPU. To run LocaNMF on Nvidia GPU, a Nvidia 
