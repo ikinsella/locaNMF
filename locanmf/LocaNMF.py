@@ -168,6 +168,7 @@ def rank_linesearch(low_rank_video,
                     region_lr_videos,
                     rank_range=(2, 14, 1),
                     maxiter_rank=20,
+                    nnt=False,
                     verbose=[False, False, False],
                     indent='',
                     device='cuda',
@@ -180,6 +181,7 @@ def rank_linesearch(low_rank_video,
         region_lr_videos: low rank videos in each region
         rank_range: rank range
         maxiter_rank: maximum iteration rank
+        nnt: whether or not temporal components should be constrained to be nonnegative
         verbose: whether or not print status update
         indent: previous identation for printing status update
         device: computation device
@@ -206,6 +208,7 @@ def rank_linesearch(low_rank_video,
         init_from_low_rank_video(video,
                                  region_factors[-1],
                                  rank_range[0],
+                                 nnt=nnt,
                                  verbose=verbose[-1],
                                  device=device,
                                  **kwargs)
@@ -235,6 +238,7 @@ def rank_linesearch(low_rank_video,
                                          region_factors[rdx],
                                          len(region_factors[rdx]) + rank_range[-1],
                                          verbose=verbose[-1],
+                                         nnt=nnt,
                                          indent=indent+'|  |  ',
                                          device=device,
                                          **kwargs)
@@ -251,6 +255,7 @@ def rank_linesearch(low_rank_video,
         lambda_iters = lambda_linesearch(low_rank_video,
                                          region_metadata,
                                          nmf_factors,
+                                         nnt=nnt,
                                          verbose=verbose[1:],
                                          indent=indent + '|  |  ',
                                          device=device,
@@ -283,6 +288,7 @@ def rank_linesearch(low_rank_video,
 def init_from_low_rank_video(low_rank_video,
                              factorization,
                              num_components,
+                             nnt=False,
                              verbose=False,
                              indent='',
                              device='cuda',
@@ -293,6 +299,7 @@ def init_from_low_rank_video(low_rank_video,
         low_rank_video: LowRankVideo class object
         factorization: localized NMF components
         num_components: number of components
+        nnt: whether or not temporal components should be constrained to be nonnegative
         verbose: whether or not print status update
         indent: previous identation for printing status update
         device: computation device
@@ -308,9 +315,9 @@ def init_from_low_rank_video(low_rank_video,
         print(indent + '|--v HALS Itertations')
     hals(low_rank_video,
          factorization,
+         nnt=nnt,
          verbose=verbose,
          indent=indent+'|  ',
-         nnt=False,
          device=device,
          **kwargs)
 
@@ -392,6 +399,7 @@ def lambda_linesearch(video,
                       lambda_step=1.5,
                       loc_thresh=20,
                       maxiter_lambda=15,
+                      nnt=False,
                       verbose=False,
                       indent='',
                       device='cuda',
@@ -406,6 +414,7 @@ def lambda_linesearch(video,
         lambda_step: step size for tuning lambda parameter
         loc_thresh: minimum localization required for a component
         maxiter_lambda: maximum number of iteration for tuning lambda parameter
+        nnt: whether or not temporal components should be constrained to be nonnegative
         verbose: whether or not print status update
         indent: previous identation for printing status update
         device: computation device
@@ -446,6 +455,7 @@ def lambda_linesearch(video,
         # Perform HALS
         hals_iters = hals(video,
                           localized_factorization,
+                          nnt=nnt,
                           verbose=verbose[-1],
                           indent=indent+'|  |  ',
                           device=device,
@@ -498,6 +508,7 @@ def lambda_linesearch(video,
 def hals(video,
          video_factorization,
          maxiter_hals=30,
+         nnt=False,
          verbose=False,
          indent='',
          device='cuda',
@@ -508,6 +519,7 @@ def hals(video,
         video: LowRankVideo class object
         video_factorization: localized NMF factors
         maxiter_hals: maximum number of iterations to tune hals
+        nnt: whether or not temporal components should be constrained to be nonnegative
         verbose: whether or not print status update
         indent: previous identation for printing status update
         device: computation device
@@ -536,15 +548,22 @@ def hals(video,
         video_factorization.normalize_spatial()
         if verbose:
             if device=='cuda': torch.cuda.synchronize()
-            print(indent + '|  |--> Component prune took {:g} seconds'.format(time()-step_t0))
+            print(indent + '|  |--> Component prune after spatial update took {:g} seconds'.format(time()-step_t0))
             step_t0 = itr_t0
 
         # Temporal Update Step
-        video_factorization.update_temporal(video, nonnegative=False)
+        video_factorization.update_temporal(video, nonnegative=nnt)
         if verbose:
             if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |--> Temporal update took {:g} seconds'.format(time()-step_t0))
             print(indent + '|  \'-total : {:g} seconds'.format(time()-itr_t0))
+        if nnt:
+            # Remove Empty Components
+            video_factorization.prune_empty_components()
+            if verbose:
+                if device=='cuda': torch.cuda.synchronize()
+                print(indent + '|  |--> Component prune after temporal update took {:g} seconds'.format(time()-step_t0))
+                step_t0 = itr_t0
 
     return itr + 1
 
