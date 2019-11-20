@@ -557,13 +557,13 @@ def hals(video,
             if device=='cuda': torch.cuda.synchronize()
             print(indent + '|  |--> Temporal update took {:g} seconds'.format(time()-step_t0))
             print(indent + '|  \'-total : {:g} seconds'.format(time()-itr_t0))
-        if nnt:
-            # Remove Empty Components
-            video_factorization.prune_empty_components()
-            if verbose:
-                if device=='cuda': torch.cuda.synchronize()
-                print(indent + '|  |--> Component prune after temporal update took {:g} seconds'.format(time()-step_t0))
-                step_t0 = itr_t0
+            
+        # Remove Empty Components
+        video_factorization.prune_empty_components()
+        if verbose:
+            if device=='cuda': torch.cuda.synchronize()
+            print(indent + '|  |--> Component prune after temporal update took {:g} seconds'.format(time()-step_t0))
+            step_t0 = itr_t0
 
     return itr + 1
 
