@@ -27,7 +27,7 @@ conda list
 <!-- pytorch only requires nvidia driver, doesn't require to install cuda. -->
 Create a new environment for LocaNMF and install LocaNMF software and all of its dependencies.
 ```
-conda create -n locanmf python=3.6 locanmf -c jw3132 -c pytorch
+conda create -n locanmf python=3.6 locanmf -c ss5513 -c pytorch
 ```
 
 ## Use LocaNMF
@@ -53,7 +53,7 @@ Python 3.6.8 |Anaconda, Inc.| (default, Dec 30 2018, 01:22:34)
 Type "help", "copyright", "credits" or "license" for more information.
 >>> from  locanmf import LocaNMF
 >>> LocaNMF.version()
-version = 1.0
+version = 1.1
 >>>
 ```
 
