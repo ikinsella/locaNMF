@@ -30,7 +30,10 @@ def native_update(Beta,
 
     # TODO Implement Batching To Mitigate GPU Bottleneck
     for ndx in range(Beta.shape[0]):
-        tmp_scale = 1.0 / Sigma[ndx, ndx].item()
+        if Sigma[ndx, ndx].item()!=0:
+            tmp_scale = 1.0 / Sigma[ndx, ndx].item()
+        else:
+            tmp_scale = 1.0
         torch.addmv(Delta[ndx],
                     Beta.t(),
                     Sigma[ndx],
