@@ -5,7 +5,7 @@ data and allows user to directly compare activity across multiple mice by output
 localized functional regions. LocaNMF uses a fast low-rank version of Hierarchical Alternating Least 
 Squares (HALS), and outputs components that are signiﬁcantly more interpretable than traditional NMF
 or SVD-based techniques. Read more about this method and the results it provides in our bioRxiv : 
-[Saxena et al., 2019](https://www.biorxiv.org/content/10.1101/650093v1)!
+[Saxena et al., 2019](https://www.biorxiv.org/content/10.1101/650093v2)!
  
 It is built on top of PyTorch, written in Python and C++, and is capable to run on either CPU or
 Nvidia CUDA-enabled GPU. To run LocaNMF on Nvidia GPU, a Nvidia 
@@ -71,7 +71,8 @@ The code is editable and can be run cell by cell by pressing "shift + enter".
 LocaNMF [documentation](http://htmlpreview.github.io/?https://github.com/ikinsella/locaNMF/blob/master/doc/locanmf.html) 
 is also available.
 
-
+## Preprocessing
+[Check out MATLAB code to preprocess your data for LocaNMF.](https://github.com/ss5513/locaNMF-preprocess)
 
 <!--TODO: 
 
